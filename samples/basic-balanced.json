@@ -1,0 +1,18 @@
+{
+  "players": [
+    { "name": "Mạnh", "position": "Cong_chinh", "sub_position": "Chuyen", "position_tier": { "tier": "A+", "score": 85 }, "sub_position_tier": { "tier": "A", "score": 75 } },
+    { "name": "Vũ", "position": "Cong_thu", "sub_position": "Cong_chinh", "position_tier": { "tier": "B", "score": 55 }, "sub_position_tier": { "tier": "B+", "score": 65 } },
+    { "name": "Bình", "position": "Cong_thu", "sub_position": "Cong_chinh", "position_tier": { "tier": "B+", "score": 65 }, "sub_position_tier": { "tier": "B+", "score": 65 } },
+    { "name": "Thiện", "position": "Chuyen", "sub_position": "Cong_chinh", "position_tier": { "tier": "A", "score": 75 }, "sub_position_tier": { "tier": "A+", "score": 85 } },
+    { "name": "Tân", "position": "Cong_thu", "sub_position": "Cong_chinh", "position_tier": { "tier": "B+", "score": 65 }, "sub_position_tier": { "tier": "B+", "score": 65 } },
+    { "name": "Đạt", "position": "Cong_chinh", "sub_position": "Libero", "position_tier": { "tier": "A", "score": 75 }, "sub_position_tier": { "tier": "B+", "score": 65 } },
+    { "name": "Long", "position": "Cong_chinh", "sub_position": "Cong_thu", "position_tier": { "tier": "A+", "score": 85 }, "sub_position_tier": { "tier": "B", "score": 55 } },
+    { "name": "Ý", "position": "Cong_thu", "sub_position": "", "position_tier": { "tier": "B", "score": 55 }, "sub_position_tier": { "tier": "B", "score": 55 } },
+    { "name": "My", "position": "Cong_thu", "sub_position": "", "position_tier": { "tier": "C+", "score": 45 }, "sub_position_tier": { "tier": "C+", "score": 45 } },
+    { "name": "Tuyền", "position": "Libero", "sub_position": "", "position_tier": { "tier": "B", "score": 55 }, "sub_position_tier": { "tier": "A", "score": 75 } },
+    { "name": "Thức", "position": "Chuyen", "sub_position": "Libero", "position_tier": { "tier": "S", "score": 95 }, "sub_position_tier": { "tier": "A", "score": 75 } },
+    { "name": "Ngọc", "position": "Cong_thu", "sub_position": "", "position_tier": { "tier": "C", "score": 35 }, "sub_position_tier": { "tier": "C+", "score": 45 } }
+  ],
+  "chung": [["Thức", "Thiện"]],
+  "rieng": [["Mạnh", "Đạt"]]
+}

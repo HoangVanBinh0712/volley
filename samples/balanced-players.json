@@ -1,0 +1,18 @@
+{
+  "players": [
+    {"name": "Player 1", "position": "Setter", "sub_position": "Spiker", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 2", "position": "Spiker", "sub_position": "Setter", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 3", "position": "Flex", "sub_position": "Libero", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 4", "position": "Libero", "sub_position": "Flex", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 5", "position": "Setter", "sub_position": "Flex", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 6", "position": "Spiker", "sub_position": "Flex", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 7", "position": "Flex", "sub_position": "Setter", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 8", "position": "Libero", "sub_position": "Flex", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 9", "position": "Setter", "sub_position": "Spiker", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 10", "position": "Spiker", "sub_position": "Setter", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 11", "position": "Flex", "sub_position": "Libero", "chuyen": 7, "cong": 7, "thu": 7},
+    {"name": "Player 12", "position": "Libero", "sub_position": "Flex", "chuyen": 7, "cong": 7, "thu": 7}
+  ],
+  "togetherGroups": [],
+  "separateGroups": []
+}

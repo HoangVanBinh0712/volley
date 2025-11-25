@@ -1,0 +1,102 @@
+{
+  "players": [
+    {
+      "name": "Mạnh",
+      "position": "Spiker",
+      "sub_position": "Setter",
+      "chuyen": 7.5,
+      "cong": 9,
+      "thu": 7.5
+    },
+    {
+      "name": "Vũ",
+      "position": "Flex",
+      "sub_position": "Spiker",
+      "chuyen": 5,
+      "cong": 7.5,
+      "thu": 6
+    },
+    {
+      "name": "Bình",
+      "position": "Flex",
+      "sub_position": "Spiker",
+      "chuyen": 6,
+      "cong": 7,
+      "thu": 6
+    },
+    {
+      "name": "Thiên",
+      "position": "Setter",
+      "sub_position": "Spiker",
+      "chuyen": 8,
+      "cong": 7.5,
+      "thu": 7.5
+    },
+    {
+      "name": "Tấn",
+      "position": "Flex",
+      "sub_position": "Spiker",
+      "chuyen": 6,
+      "cong": 7.5,
+      "thu": 7
+    },
+    {
+      "name": "Đạt",
+      "position": "Spiker",
+      "sub_position": "Libero",
+      "chuyen": 6.5,
+      "cong": 8,
+      "thu": 7.5
+    },
+    {
+      "name": "Long Zú Bu",
+      "position": "Spiker",
+      "sub_position": "Flex",
+      "chuyen": 5,
+      "cong": 9,
+      "thu": 6
+    },
+    {
+      "name": "Ý",
+      "position": "Flex",
+      "sub_position": "Setter",
+      "chuyen": 6.5,
+      "cong": 7,
+      "thu": 6
+    },
+    {
+      "name": "Mỹ",
+      "position": "Flex",
+      "sub_position": "Setter",
+      "chuyen": 5,
+      "cong": 5,
+      "thu": 6
+    },
+    {
+      "name": "Huyền",
+      "position": "Libero",
+      "sub_position": "Flex",
+      "chuyen": 5,
+      "cong": 5,
+      "thu": 7
+    },
+    {
+      "name": "Thức",
+      "position": "Setter",
+      "sub_position": "Libero",
+      "chuyen": 9,
+      "cong": 7.5,
+      "thu": 7.5
+    },
+    {
+      "name": "Ngọc",
+      "position": "Flex",
+      "sub_position": "Setter",
+      "chuyen": 5,
+      "cong": 5,
+      "thu": 6
+    }
+  ],
+  "chung": [],
+  "rieng": []
+}
