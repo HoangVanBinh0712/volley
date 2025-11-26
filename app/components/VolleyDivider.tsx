@@ -130,7 +130,8 @@ export default function VolleyDivider() {
                         >
                             ⚔️ Chia Đội
                         </button>
-                        <button
+                        {/* Edit Tab - Hidden for future release */}
+                        {/* <button
                             type="button"
                             onClick={() => setActiveTab('edit-tab')}
                             className={`tab-button px-4 sm:px-6 py-3 font-semibold text-sm sm:text-base transition duration-200 ease-in-out whitespace-nowrap ${
@@ -138,7 +139,7 @@ export default function VolleyDivider() {
                             }`}
                         >
                             ✏️ Chỉnh Sửa
-                        </button>
+                        </button> */}
                     </nav>
                 </div>
 

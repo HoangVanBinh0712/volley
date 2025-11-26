@@ -1,20 +1,108 @@
 {
-  "scenario": "Lack of Spiker Test",
-  "nTeams": 4,
-  "togetherGroups": [],
-  "separateGroups": [],
-  "players": [
-    { "nickName": "M_SP1", "name": "Main_Spiker_1", "position": "Spiker", "position_tier": { "tier": "S", "score": 95 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "M_SP2", "name": "Main_Spiker_2", "position": "Spiker", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "F_SP1", "name": "Flex_Spiker_1", "position": "Setter", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "Spiker", "sub_position_tier": { "tier": "A", "score": 75 } },
-    { "nickName": "F_SP2", "name": "Flex_Spiker_2", "position": "Libero", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "Spiker", "sub_position_tier": { "tier": "B", "score": 55 } },
-    { "nickName": "S1", "name": "Setter_1", "position": "Setter", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "S2", "name": "Setter_2", "position": "Setter", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "S3", "name": "Setter_3", "position": "Setter", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "S4", "name": "Setter_4", "position": "Setter", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "L1", "name": "Libero_1", "position": "Libero", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "L2", "name": "Libero_2", "position": "Libero", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "L3", "name": "Libero_3", "position": "Libero", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
-    { "nickName": "L4", "name": "Libero_4", "position": "Libero", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } }
-  ]
+    "scenario":  "Lack of Spiker Test",
+    "nTeams":  4,
+    "togetherGroups":  [
+
+                       ],
+    "separateGroups":  [
+
+                       ],
+    "players":  [
+                    {
+                        "nickName":  "M_SP1",
+                        "name":  "Main_Spiker_1",
+                        "position":  "Spiker",
+                        "position_tier":  "S",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "M_SP2",
+                        "name":  "Main_Spiker_2",
+                        "position":  "Spiker",
+                        "position_tier":  "A",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "F_SP1",
+                        "name":  "Flex_Spiker_1",
+                        "position":  "Setter",
+                        "position_tier":  "B",
+                        "sub_position":  "Spiker",
+                        "sub_position_tier":  "A"
+                    },
+                    {
+                        "nickName":  "F_SP2",
+                        "name":  "Flex_Spiker_2",
+                        "position":  "Libero",
+                        "position_tier":  "B",
+                        "sub_position":  "Spiker",
+                        "sub_position_tier":  "B"
+                    },
+                    {
+                        "nickName":  "S1",
+                        "name":  "Setter_1",
+                        "position":  "Setter",
+                        "position_tier":  "A",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "S2",
+                        "name":  "Setter_2",
+                        "position":  "Setter",
+                        "position_tier":  "A",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "S3",
+                        "name":  "Setter_3",
+                        "position":  "Setter",
+                        "position_tier":  "B",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "S4",
+                        "name":  "Setter_4",
+                        "position":  "Setter",
+                        "position_tier":  "C",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "L1",
+                        "name":  "Libero_1",
+                        "position":  "Libero",
+                        "position_tier":  "A",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "L2",
+                        "name":  "Libero_2",
+                        "position":  "Libero",
+                        "position_tier":  "B",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "L3",
+                        "name":  "Libero_3",
+                        "position":  "Libero",
+                        "position_tier":  "C",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    },
+                    {
+                        "nickName":  "L4",
+                        "name":  "Libero_4",
+                        "position":  "Libero",
+                        "position_tier":  "C",
+                        "sub_position":  "",
+                        "sub_position_tier":  "C"
+                    }
+                ]
 }

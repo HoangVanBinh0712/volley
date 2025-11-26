@@ -42,24 +42,39 @@ export default function ResultsTable({ teams }: ResultsTableProps) {
                                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Tên</th>
                                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Vị trí</th>
                                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Cấp Độ</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Lưu Ý</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-100">
-                                {team.players.map((p, idx) => (
-                                    <tr key={idx} className={`transition duration-150 ${
-                                        idx % 2 === 0 ? 'hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-50'
-                                    } text-gray-700`}>
-                                        <td className="px-4 py-3 whitespace-nowrap font-semibold text-indigo-600">{idx + 1}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap font-bold">{p.name}</td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                            <span className="font-semibold text-green-700">{p.finalPosition}</span>
-                                            {p.finalPosition !== p.subPosition && p.subPosition && (
-                                                <span className="text-red-500 text-xs block mt-1">({p.subPosition})</span>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap font-bold text-indigo-600">{p.positionTier}</td>
-                                    </tr>
-                                ))}
+                                {team.players.map((p, idx) => {
+                                    const violation = (p as any).violation;
+                                    return (
+                                        <tr key={idx} className={`transition duration-150 ${
+                                            violation 
+                                                ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500'
+                                                : idx % 2 === 0 
+                                                    ? 'hover:bg-indigo-50' 
+                                                    : 'bg-gray-50 hover:bg-indigo-50'
+                                        } text-gray-700`}>
+                                            <td className="px-4 py-3 whitespace-nowrap font-semibold text-indigo-600">{idx + 1}</td>
+                                            <td className={`px-4 py-3 whitespace-nowrap font-bold ${violation ? 'text-red-600' : ''}`}>{p.name}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                                <span className="font-semibold text-green-700">{p.finalPosition}</span>
+                                                {p.finalPosition !== p.subPosition && p.subPosition && (
+                                                    <span className="text-red-500 text-xs block mt-1">({p.subPosition})</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap font-bold text-indigo-600">{p.positionTier}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap">
+                                                {violation && (
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800">
+                                                        ⚠️ Vi phạm: {violation}
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

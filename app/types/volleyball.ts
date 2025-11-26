@@ -2,18 +2,13 @@
  * Volleyball Application Type Definitions
  */
 
-export interface PlayerTier {
-    tier: string;
-    score: number;
-}
-
 export interface BasicPlayer {
     nickName: string;
     name: string;
     position: string;
-    position_tier: PlayerTier;
+    position_tier: string;
     sub_position: string;
-    sub_position_tier: PlayerTier;
+    sub_position_tier: string;
     finalPosition?: string;
     id?: number;
 }

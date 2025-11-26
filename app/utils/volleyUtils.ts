@@ -3,7 +3,7 @@
  * Contains core logic for team calculations and divisions
  */
 
-import { Player, BasicPlayer, Team, PlayerTier, isBasicPlayer } from '@/app/types/volleyball';
+import { Player, BasicPlayer, Team, isBasicPlayer } from '@/app/types/volleyball';
 
 // Tier to score mapping for Basic mode
 const TIER_SCORES: Record<string, number> = {
@@ -20,8 +20,8 @@ const TIER_SCORES: Record<string, number> = {
  * Calculate OPS for Basic player (average of position and sub_position tier scores)
  */
 export function calculateBasicOPS(p: BasicPlayer): number {
-    const positionScore = TIER_SCORES[p.position_tier.tier] || 0;
-    const subPositionScore = TIER_SCORES[p.sub_position_tier.tier] || 0;
+    const positionScore = TIER_SCORES[p.position_tier] || 0;
+    const subPositionScore = TIER_SCORES[p.sub_position_tier] || 0;
     return (positionScore + subPositionScore) / 2;
 }
 
@@ -37,9 +37,6 @@ export function generateResults(
     strategy: string = 'v1'
 ): Team[] {
     const basicPlayers = players as BasicPlayer[];
-    if (strategy === 'v2') {
-        return divideTeamsBasicV2(nTeams, basicPlayers, togetherGroups, separateGroups, randomize);
-    }
     return divideTeamsBasic(nTeams, basicPlayers, togetherGroups, separateGroups, randomize);
 }
 
@@ -55,6 +52,89 @@ function shuffleArray<T>(array: T[]): T[] {
     return shuffled;
 }
 
+/**
+ * Normalize role names (handles Vietnamese and English variations)
+ */
+function normalizeRole(role: string): string {
+    if (!role) return "";
+    const r = role.trim().toLowerCase();
+    if (r === "chuyen" || r === "setter" || r === "chuyền") return "Setter";
+    if (r === "cong_chinh" || r === "spiker" || r === "công chính" || r === "cong chinh") return "Spiker";
+    if (r === "cong_thu" || r === "flex" || r === "công thủ" || r === "cong thu") return "Flex";
+    if (r === "libero") return "Libero";
+    return role;
+}
+
+/**
+ * Auto-balance roles: ensures minimum required players per role
+ */
+function autoBalanceRoles(players: any[], nTeams: number, mandatoryRoles: string[]): void {
+    for (const role of mandatoryRoles) {
+        const current = players.filter((p) => p.finalPosition === role).length;
+        if (current < nTeams) {
+            const missing = nTeams - current;
+            const candidates = players
+                .filter((p) => normalizeRole(p.sub_position) === role && p.finalPosition !== role)
+                .sort((a, b) => b.ops - a.ops);
+            for (let i = 0; i < missing && i < candidates.length; i++) {
+                candidates[i].finalPosition = role;
+            }
+        }
+    }
+}
+
+/**
+ * Get total OPS for a team
+ */
+function getTeamTotalOps(team: Team): number {
+    return team.players.reduce((sum, p) => {
+        const opsStr = (p as any).ops || '0';
+        return sum + parseFloat(opsStr);
+    }, 0);
+}
+
+/**
+ * Get teams that don't have players with a specific role
+ */
+function getTeamsMissingRole(teams: Team[], role: string): number[] {
+    return teams
+        .map((_, idx) => idx)
+        .filter((idx) =>
+            !teams[idx].players.some((p) => normalizeRole(p.finalPosition || "") === role)
+        );
+}
+
+/**
+ * Find team with lowest balance from candidates
+ */
+function getTeamWithLowestBalance(teams: Team[], candidateIndices: number[]): number {
+    if (candidateIndices.length === 0) return 0;
+    return candidateIndices.reduce((lowestIdx, idx) =>
+        getTeamTotalOps(teams[idx]) < getTeamTotalOps(teams[lowestIdx]) ? idx : lowestIdx
+    );
+}
+
+/**
+ * Assign player to team and handle group constraints
+ */
+function assignPlayerToTeam(
+    teams: Team[],
+    player: any,
+    teamIdx: number,
+    assignedNames: Set<string>
+): void {
+    if (assignedNames.has(player.name)) return;
+    const playerData = {
+        name: player.name,
+        finalPosition: player.finalPosition,
+        subPosition: player.sub_position,
+        positionTier: player.position_tier,
+        subPositionTier: player.sub_position_tier,
+        ops: player.ops.toFixed(2)
+    };
+    teams[teamIdx].players.push(playerData);
+    assignedNames.add(player.name);
+}
 
 /**
  * Basic mode division algorithm (tier-based)
@@ -76,9 +156,6 @@ function divideTeamsBasic(
         finalPosition: normalizeRole(p.position || p.sub_position || "")
     }));
 
-    // Auto-balance roles
-    autoBalanceRoles(workingPlayers, nTeams, mandatoryRoles);
-
     // Initialize teams
     const teams: Team[] = Array.from({ length: nTeams }, (_, i) => ({
         id: i + 1,
@@ -87,173 +164,261 @@ function divideTeamsBasic(
 
     const assignedNames = new Set<string>();
 
-    // Determine target sizes for each team to ensure even distribution
+    // Helper function to get unassigned players
+    const getUnassigned = () => workingPlayers.filter(p => !assignedNames.has(p.name));
+
+    // Helper function to check if placing a player on a team violates separateGroups
+    const violatesSeparate = (teamIdx: number, playerName: string): boolean => {
+        const teamNames = new Set(teams[teamIdx].players.map(p => p.name));
+        for (const pair of separateGroups) {
+            if (pair.includes(playerName)) {
+                for (const member of pair) {
+                    if (member !== playerName && teamNames.has(member)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
+    // STEP 1: Assign togetherGroups to empty teams
+    for (const group of togetherGroups) {
+        // Find first empty team
+        const emptyTeamIdx = teams.findIndex(t => t.players.length === 0);
+        if (emptyTeamIdx === -1) break; // No more empty teams
+
+        // Assign all group members to this team
+        for (const playerName of group) {
+            const player = workingPlayers.find(p => p.name === playerName && !assignedNames.has(p.name));
+            if (player) {
+                assignPlayerToTeam(teams, player, emptyTeamIdx, assignedNames);
+            }
+        }
+    }
+
+    // STEP 2: Assign mandatory roles (Setter, Spiker, Libero) ordered by tier
+    // If randomize is enabled, randomly select 1 role out of 3 to shuffle
+    const roleToRandomize = randomize ? mandatoryRoles[Math.floor(Math.random() * mandatoryRoles.length)] : null;
+
+    for (const role of mandatoryRoles) {
+        // Get teams missing this role
+        const teamsMissingRole = Array.from({ length: nTeams }, (_, i) => i).filter(
+            teamIdx => !teams[teamIdx].players.some(p => normalizeRole(p.finalPosition || "") === role)
+        );
+
+        if (teamsMissingRole.length === 0) continue;
+
+        // Get unassigned candidates for this role, ordered by tier (high to low)
+        let candidates = getUnassigned().filter(
+            p => p.finalPosition === role || normalizeRole(p.sub_position) === role
+        );
+
+        if (candidates.length === 0) continue;
+
+        // Sort by OPS descending (highest tier first)
+        candidates.sort((a, b) => (b.ops ?? 0) - (a.ops ?? 0));
+
+        // If this role was randomly selected, shuffle all candidates
+        if (role === roleToRandomize) {
+            for (let i = candidates.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+            }
+        }
+
+        // Assign one candidate to each team missing the role (starting with lowest OPS team)
+        for (const teamIdx of teamsMissingRole) {
+            if (candidates.length === 0) break;
+
+            // Find best candidate that doesn't violate separateGroups
+            let selectedIdx = candidates.findIndex(c => !violatesSeparate(teamIdx, c.name));
+            if (selectedIdx === -1) {
+                // If no candidate satisfies separate rules, pick the first one anyway
+                selectedIdx = 0;
+            }
+
+            const candidate = candidates[selectedIdx];
+            candidate.finalPosition = role;
+            assignPlayerToTeam(teams, candidate, teamIdx, assignedNames);
+            candidates.splice(selectedIdx, 1);
+        }
+    }
+
+    // STEP 3: Fill remaining players - assign higher tier to lower OPS teams while respecting separate rules and size limits
+    let remaining = getUnassigned();
+    
+    // Calculate target size per team
     const totalPlayers = workingPlayers.length;
     const baseSize = Math.floor(totalPlayers / nTeams);
     const extra = totalPlayers % nTeams;
     const targetSizes = Array.from({ length: nTeams }, (_, i) => baseSize + (i < extra ? 1 : 0));
+    
+    // Sort remaining players by OPS descending (higher tier first)
+    remaining.sort((a, b) => (b.ops ?? 0) - (a.ops ?? 0));
 
-    const teamHasCapacity = (idx: number) => teams[idx].players.length < targetSizes[idx];
-
-    // 1. Assign mandatory roles first (ensures each team has key positions)
-    for (const role of mandatoryRoles) {
-        // Teams lacking the role (prefer those with capacity)
-        let missingWithCap = getTeamsMissingRole(teams, role).filter(teamHasCapacity);
-        const missingWithoutCap = getTeamsMissingRole(teams, role).filter((idx) => !teamHasCapacity(idx));
-
-        if (missingWithCap.length === 0 && missingWithoutCap.length === 0) continue;
-
-        // Build candidate pools in preferred order:
-        // 1) players whose finalPosition already matches the role
-        // 2) players whose sub_position matches the role
-        // 3) any other available players (fallback)
-        let poolExact = workingPlayers.filter((p) => p.finalPosition === role && !assignedNames.has(p.name));
-        let poolSub = workingPlayers.filter((p) => normalizeRole(p.sub_position) === role && !assignedNames.has(p.name) && p.finalPosition !== role);
-        let poolOthers = workingPlayers.filter((p) => !assignedNames.has(p.name) && p.finalPosition !== role && normalizeRole(p.sub_position) !== role);
-
-        const sortByOpsDesc = (arr: any[]) => arr.sort((a, b) => b.ops - a.ops);
-        poolExact = sortByOpsDesc(poolExact);
-        poolSub = sortByOpsDesc(poolSub);
-        poolOthers = sortByOpsDesc(poolOthers);
-
-        // If randomization requested, shuffle within preference groups to introduce variability
-        if (randomize) {
-            poolExact = shuffleArray(poolExact);
-            poolSub = shuffleArray(poolSub);
-            poolOthers = shuffleArray(poolOthers);
+    // If randomize, shuffle within same tier groups
+    if (randomize) {
+        const tierGroups: Record<string, typeof remaining> = {};
+        for (const player of remaining) {
+            const tier = player.position_tier || player.sub_position_tier || 'unknown';
+            if (!tierGroups[tier]) tierGroups[tier] = [];
+            tierGroups[tier].push(player);
         }
-
-        // Merge pools preserving preference ordering
-        const candidates = [...poolExact, ...poolSub, ...poolOthers];
-
-        // Assign candidates to teams missing the role, preferring teams with capacity first
-        let candidateIdx = 0;
-        while (candidateIdx < candidates.length && missingWithCap.length > 0) {
-            const targetTeamIdx = getTeamWithLowestBalance(teams, missingWithCap);
-            const player = candidates[candidateIdx];
-            // Ensure the player's finalPosition reflects the role being assigned
-            player.finalPosition = role;
-            assignPlayerToTeam(teams, player, targetTeamIdx, assignedNames);
-            candidateIdx++;
-            // recompute missing teams with capacity
-            missingWithCap = getTeamsMissingRole(teams, role).filter(teamHasCapacity);
-        }
-
-        // If still missing teams (because of capacity limits), try to assign into teams without capacity as a last resort
-        let idxFallback = candidateIdx;
-        let missingFallback = missingWithoutCap.slice();
-        while (idxFallback < candidates.length && missingFallback.length > 0) {
-            const targetTeamIdx = getTeamWithLowestBalance(teams, missingFallback);
-            const player = candidates[idxFallback];
-            player.finalPosition = role;
-            assignPlayerToTeam(teams, player, targetTeamIdx, assignedNames);
-            idxFallback++;
-            missingFallback = getTeamsMissingRole(teams, role).filter((i) => !teamHasCapacity(i));
+        remaining = [];
+        for (const tier of Object.keys(tierGroups)) {
+            remaining = remaining.concat(shuffleArray(tierGroups[tier]));
         }
     }
 
-    // 2. Handle remaining together groups (players who must be together)
-    for (const group of togetherGroups) {
-        // assume togetherGroups are valid and will not violate team sizes
-        if (!group.some((name) => assignedNames.has(name))) {
-            const targetIdx = getTeamWithLowestBalance(
-                teams,
-                Array.from({ length: nTeams }, (_, i) => i)
-            );
-            for (const role of mandatoryRoles) {
-                // Skip role if all teams already have it
-                let teamsMissingRole = getTeamsMissingRole(teams, role);
-                console.log(`  Role: ${role}, teams missing this role: ${teamsMissingRole.length}/${nTeams}`);
-                if (teamsMissingRole.length === 0) {
-                    console.log(`    → All teams already have ${role}, skipping.`);
-                    continue;
-                }
+    for (const player of remaining) {
+        // Find teams sorted by lowest OPS and that have capacity
+        const teamIndices = Array.from({ length: nTeams }, (_, i) => i)
+            .filter(idx => teams[idx].players.length < targetSizes[idx])
+            .sort((a, b) => getTeamTotalOps(teams[a]) - getTeamTotalOps(teams[b]));
 
-                // Build candidate list once; we'll remove assigned candidates as we go
-                let candidates = unassigned().filter(p => p.finalPosition === role || p.sub_position === role);
-                // sort by OPS desc
-                candidates.sort((a, b) => b.ops - a.ops);
-                if (randomize) candidates = shuffleArray(candidates);
-
-                console.log(`    Available candidates: ${candidates.length}`);
-
-                let assignedCount = 0;
-
-                // For each team missing the role, pick a single best candidate and assign them
-                // Order teams by lowest OPS so we fill weaker teams first
-                teamsMissingRole = teamsMissingRole.slice().sort((a, b) => getTeamTotalOps(teams[a]) - getTeamTotalOps(teams[b]));
-                for (const tIdx of teamsMissingRole) {
-                    if (!teamHasCapacity(tIdx)) continue;
-                    // find best candidate that doesn't violate separateGroups
-                    let foundIdx = candidates.findIndex(c => !violatesSeparate(tIdx, c.name));
-                    // if none found, relax separation constraint
-                    if (foundIdx === -1) {
-                        foundIdx = candidates.findIndex(() => true);
-                    }
-                    if (foundIdx === -1) continue; // no candidates left
-
-                    const candidate = candidates[foundIdx];
-                    candidate.finalPosition = role;
-                    assignPlayerToTeam(teams, candidate, tIdx, assignedNames);
-                    assignedCount++;
-                    console.log(`    Assigned ${candidate.name} (OPS: ${candidate.ops.toFixed(2)}) to team ${tIdx + 1} for role ${role}`);
-
-                    // remove candidate from list
-                    candidates.splice(foundIdx, 1);
-                }
-
-                console.log(`    → Assigned ${assignedCount} ${role}s (one per missing team)`);
+        let assigned = false;
+        // Try to assign to a team that doesn't violate separate rules
+        for (const teamIdx of teamIndices) {
+            if (!violatesSeparate(teamIdx, player.name)) {
+                assignPlayerToTeam(teams, player, teamIdx, assignedNames);
+                assigned = true;
+                break;
             }
-    // Build groups keyed by primary tier (fallback to sub_position tier or ops string)
-    const groups: Record<string, any[]> = {};
-    for (const p of remaining) {
-        const primaryTier = (p.position_tier && p.position_tier.tier) || (p.sub_position_tier && p.sub_position_tier.tier) || p.ops.toFixed(2);
-        groups[primaryTier] = groups[primaryTier] || [];
-        groups[primaryTier].push(p);
-    }
-
-    // Sort group keys by tier strength descending using TIER_SCORES; numeric keys fall back to numeric sort
-    const groupKeys = Object.keys(groups).sort((a, b) => {
-        const scoreA = TIER_SCORES[a] ?? (isNaN(Number(a)) ? 0 : Number(a));
-        const scoreB = TIER_SCORES[b] ?? (isNaN(Number(b)) ? 0 : Number(b));
-        return scoreB - scoreA;
-    });
-
-    // For each group, optionally shuffle within the group (randomize true), otherwise sort by OPS desc
-    let orderedRemaining: any[] = [];
-    for (const key of groupKeys) {
-        let groupArr = groups[key];
-        if (!Array.isArray(groupArr) || groupArr.length === 0) continue;
-        if (randomize) {
-            groupArr = shuffleArray(groupArr);
-        } else {
-            groupArr = groupArr.sort((a, b) => b.ops - a.ops);
         }
-        orderedRemaining = orderedRemaining.concat(groupArr);
-    }
 
-    // Now distribute orderedRemaining in round-robin rounds to spread top-tier players
-    const anyTeamHasCapacity = () => Array.from({ length: nTeams }, (_, i) => i).some(teamHasCapacity);
-
-    while (orderedRemaining.length > 0 && anyTeamHasCapacity()) {
-        // team order per round (shuffled when randomize to add variability)
-        let teamOrder = Array.from({ length: nTeams }, (_, i) => i);
-        if (randomize) teamOrder = shuffleArray(teamOrder);
-
-        for (const tIdx of teamOrder) {
-            if (orderedRemaining.length === 0) break;
-            if (!teamHasCapacity(tIdx)) continue;
-            const player = orderedRemaining.shift() as any;
-            assignPlayerToTeam(teams, player, tIdx, assignedNames);
+        // If all teams violate, just assign to the lowest OPS team with capacity anyway
+        if (!assigned && teamIndices.length > 0) {
+            assignPlayerToTeam(teams, player, teamIndices[0], assignedNames);
         }
     }
 
-    // Fallback: assign any leftover players to the smallest team
-    while (orderedRemaining.length > 0) {
-        const bySize = Array.from({ length: nTeams }, (_, i) => i).sort((a, b) => teams[a].players.length - teams[b].players.length || getTeamTotalOps(teams[a]) - getTeamTotalOps(teams[b]));
-        const targetIdx = bySize[0];
-        const player = orderedRemaining.shift() as any;
-        assignPlayerToTeam(teams, player, targetIdx, assignedNames);
+    // STEP 4: Fix separate rule violations by swapping players with same role
+    for (let teamIdx = 0; teamIdx < teams.length; teamIdx++) {
+        const team = teams[teamIdx];
+        const teamNames = new Set(team.players.map(p => p.name));
+
+        // Check each player in this team for violations
+        for (let playerIdx = 0; playerIdx < team.players.length; playerIdx++) {
+            const player = team.players[playerIdx];
+
+            // Check if this player violates separateGroups
+            let violatedPair: string[] | null = null;
+            for (const pair of separateGroups) {
+                if (pair.includes(player.name)) {
+                    const rival = pair.find(name => name !== player.name && teamNames.has(name));
+                    if (rival) {
+                        violatedPair = pair;
+                        break;
+                    }
+                }
+            }
+
+            if (violatedPair) {
+                // Try to find a player with same finalPosition in another team to swap with
+                let swapped = false;
+                for (let otherTeamIdx = 0; otherTeamIdx < teams.length && !swapped; otherTeamIdx++) {
+                    if (otherTeamIdx === teamIdx) continue;
+                    const otherTeam = teams[otherTeamIdx];
+
+                    // Find a player in other team with same role
+                    for (let otherPlayerIdx = 0; otherPlayerIdx < otherTeam.players.length; otherPlayerIdx++) {
+                        const otherPlayer = otherTeam.players[otherPlayerIdx];
+                        
+                        // Check if they have same final position
+                        if (otherPlayer.finalPosition === player.finalPosition) {
+                            // Verify swap doesn't create new violations
+                            const newTeamNames = new Set(teamNames);
+                            newTeamNames.delete(player.name);
+                            newTeamNames.add(otherPlayer.name);
+
+                            const otherTeamNames = new Set(otherTeam.players.map(p => p.name));
+                            otherTeamNames.delete(otherPlayer.name);
+                            otherTeamNames.add(player.name);
+
+                            let violatesAfterSwap = false;
+
+                            // Check if player would violate in other team
+                            for (const pair of separateGroups) {
+                                if (pair.includes(player.name)) {
+                                    const rival = pair.find(name => name !== player.name && otherTeamNames.has(name));
+                                    if (rival) {
+                                        violatesAfterSwap = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Check if otherPlayer would violate in this team
+                            if (!violatesAfterSwap) {
+                                for (const pair of separateGroups) {
+                                    if (pair.includes(otherPlayer.name)) {
+                                        const rival = pair.find(name => name !== otherPlayer.name && newTeamNames.has(name));
+                                        if (rival) {
+                                            violatesAfterSwap = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // If swap is safe, perform it
+                            if (!violatesAfterSwap) {
+                                team.players[playerIdx] = otherPlayer;
+                                otherTeam.players[otherPlayerIdx] = player;
+                                teamNames.delete(player.name);
+                                teamNames.add(otherPlayer.name);
+                                swapped = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // STEP 5: Mark remaining violations with violation indicators
+    for (let teamIdx = 0; teamIdx < teams.length; teamIdx++) {
+        const team = teams[teamIdx];
+        const teamNames = new Set(team.players.map(p => p.name));
+
+        // Check each player for violations
+        for (const player of team.players) {
+            for (const pair of separateGroups) {
+                if (pair.includes(player.name)) {
+                    // Check if any rival is on the same team
+                    for (const rival of pair) {
+                        if (rival !== player.name && teamNames.has(rival)) {
+                            // Mark both players with violation info
+                            (player as any).violation = rival;
+                            const rivalPlayer = team.players.find(p => p.name === rival);
+                            if (rivalPlayer) {
+                                (rivalPlayer as any).violation = player.name;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // STEP 6: Sort players within each team by position order (SETTER, SPIKER, LIBERO, FLEX)
+    const positionOrder: Record<string, number> = {
+        "Setter": 1,
+        "Spiker": 2,
+        "Libero": 3,
+        "Flex": 4
+    };
+
+    for (const team of teams) {
+        team.players.sort((a, b) => {
+            const posA = normalizeRole((a as any).finalPosition || "");
+            const posB = normalizeRole((b as any).finalPosition || "");
+            const orderA = positionOrder[posA] || 5;
+            const orderB = positionOrder[posB] || 5;
+            return orderA - orderB;
+        });
     }
 
     return teams;
@@ -553,120 +718,6 @@ function divideTeamsBasicV2(
 }
 
 /**
- * Normalize role names (handles Vietnamese and English variations)
- * New roles: Setter, Spiker, Flex, Libero
- */
-function normalizeRole(role: string): string {
-    if (!role) return "";
-    const r = role.trim().toLowerCase();
-    
-    // Setter mappings
-    if (r === "chuyen" || r === "setter" || r === "chuyền") return "Setter";
-    
-    // Spiker mappings (replaces Cong_chinh, công chính)
-    if (r === "cong_chinh" || r === "spiker" || r === "công chính" || r === "cong chinh") return "Spiker";
-    
-    // Flex mappings (replaces Cong_thu, công thủ)
-    if (r === "cong_thu" || r === "flex" || r === "công thủ" || r === "cong thu") return "Flex";
-    
-    // Libero mappings
-    if (r === "libero") return "Libero";
-    
-    return role;
-}
-
-/**
- * Auto-balance roles: ensures minimum required players per role
- */
-function autoBalanceRoles(
-    players: any[],
-    nTeams: number,
-    mandatoryRoles: string[]
-): void {
-    for (const role of mandatoryRoles) {
-        const current = players.filter((p) => p.finalPosition === role).length;
-
-        if (current < nTeams) {
-            const missing = nTeams - current;
-            const candidates = players
-                .filter(
-                    (p) =>
-                        normalizeRole(p.sub_position) === role && p.finalPosition !== role
-                )
-                .sort((a, b) => b.ops - a.ops);
-
-            for (let i = 0; i < missing && i < candidates.length; i++) {
-                candidates[i].finalPosition = role;
-            }
-        }
-    }
-}
-
-/**
- * Get teams that don't have players with a specific role
- */
-function getTeamsMissingRole(teams: Team[], role: string): number[] {
-    return teams
-        .map((_, idx) => idx)
-        .filter((idx) =>
-            !teams[idx].players.some((p) =>
-                normalizeRole(p.finalPosition || "") === role
-            )
-        );
-}
-
-/**
- * Get total OPS for a team
- */
-function getTeamTotalOps(team: Team): number {
-    return team.players.reduce((sum, p) => {
-        const opsStr = (p as any).ops || '0';
-        return sum + parseFloat(opsStr);
-    }, 0);
-}
-
-/**
- * Find team with lowest balance from candidates
- */
-function getTeamWithLowestBalance(teams: Team[], candidateIndices: number[]): number {
-    if (candidateIndices.length === 0) return 0;
-    return candidateIndices.reduce((lowestIdx, idx) =>
-        getTeamTotalOps(teams[idx]) < getTeamTotalOps(teams[lowestIdx]) ? idx : lowestIdx
-    );
-}
-
-/**
- * Find team with lowest total OPS from candidates (deprecated - use getTeamWithLowestBalance)
- */
-function getTeamWithLowestOPS(teams: Team[], candidateIndices: number[]): number {
-    return getTeamWithLowestBalance(teams, candidateIndices);
-}
-
-/**
- * Assign player to team and handle group constraints
- */
-function assignPlayerToTeam(
-    teams: Team[],
-    player: any,
-    teamIdx: number,
-    assignedNames: Set<string>
-): void {
-    if (assignedNames.has(player.name)) return;
-
-    const playerData = {
-        name: player.name,
-        finalPosition: player.finalPosition,
-        subPosition: player.sub_position,
-        positionTier: player.position_tier?.tier,
-        subPositionTier: player.sub_position_tier?.tier,
-        ops: player.ops.toFixed(2)
-    };
-
-    teams[teamIdx].players.push(playerData);
-    assignedNames.add(player.name);
-}
-
-/**
  * Validates and normalizes positions in player data
  * Converts old Vietnamese position names to standard ones
  */
@@ -700,12 +751,9 @@ export function isValidBasicPlayerData(data: any): boolean {
         data.players.every((p: any) =>
             typeof p.name === 'string' &&
             typeof p.position === 'string' &&
-            p.position_tier &&
-            typeof p.position_tier.tier === 'string' &&
-            typeof p.position_tier.score === 'number' &&
-            p.sub_position_tier &&
-            typeof p.sub_position_tier.tier === 'string' &&
-            typeof p.sub_position_tier.score === 'number'
+            typeof p.position_tier === 'string' &&
+            typeof p.sub_position === 'string' &&
+            typeof p.sub_position_tier === 'string'
         )
     );
 }

@@ -40,7 +40,7 @@ export default function PlayerTable({ players, title, showOPS = true }: PlayerTa
                             {showOPS && (
                                 <td className="px-4 py-3 whitespace-nowrap font-bold text-indigo-600">
                                     {isBasicPlayer(p) 
-                                        ? `${p.position_tier.tier}` 
+                                        ? `${p.position_tier}` 
                                         : calculateBasicOPS(p).toFixed(2)
                                     }
                                 </td>
