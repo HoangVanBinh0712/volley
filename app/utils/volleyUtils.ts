@@ -257,8 +257,17 @@ function divideTeamsBasic(
     // Sort remaining players by OPS descending (higher tier first)
     remaining.sort((a, b) => (b.ops ?? 0) - (a.ops ?? 0));
 
-    // If randomize, shuffle within same tier groups
-    if (randomize) {
+    // Calculate current team OPS imbalance
+    const getImbalance = () => {
+        const opsValues = Array.from({ length: nTeams }, (_, i) => getTeamTotalOps(teams[i]));
+        return Math.max(...opsValues) - Math.min(...opsValues);
+    };
+
+    // Smart randomization: only randomize if imbalance is low (< 15)
+    const shouldRandomize = randomize && getImbalance() < 15;
+
+    if (shouldRandomize) {
+        // Randomize within same tier groups to add variety while maintaining balance
         const tierGroups: Record<string, typeof remaining> = {};
         for (const player of remaining) {
             const tier = player.position_tier || player.sub_position_tier || 'unknown';
@@ -271,25 +280,76 @@ function divideTeamsBasic(
         }
     }
 
+    // Assign remaining players with greedy OPS balancing
     for (const player of remaining) {
-        // Find teams sorted by lowest OPS and that have capacity
-        const teamIndices = Array.from({ length: nTeams }, (_, i) => i)
-            .filter(idx => teams[idx].players.length < targetSizes[idx])
-            .sort((a, b) => getTeamTotalOps(teams[a]) - getTeamTotalOps(teams[b]));
+        // Find teams that have capacity
+        const teamsWithCapacity = Array.from({ length: nTeams }, (_, i) => i)
+            .filter(idx => teams[idx].players.length < targetSizes[idx]);
 
-        let assigned = false;
-        // Try to assign to a team that doesn't violate separate rules
-        for (const teamIdx of teamIndices) {
-            if (!violatesSeparate(teamIdx, player.name)) {
-                assignPlayerToTeam(teams, player, teamIdx, assignedNames);
-                assigned = true;
-                break;
+        if (teamsWithCapacity.length === 0) break;
+
+        let bestTeamIdx = -1;
+
+        // If imbalance is high, use greedy approach: assign to lowest OPS team
+        if (getImbalance() >= 15) {
+            // Try to assign to lowest OPS team that respects separate rules
+            const sortedByOps = teamsWithCapacity.sort((a, b) =>
+                getTeamTotalOps(teams[a]) - getTeamTotalOps(teams[b])
+            );
+
+            for (const teamIdx of sortedByOps) {
+                if (!violatesSeparate(teamIdx, player.name)) {
+                    bestTeamIdx = teamIdx;
+                    break;
+                }
+            }
+
+            // Fallback: if all violate, still pick lowest OPS team
+            if (bestTeamIdx === -1) {
+                bestTeamIdx = sortedByOps[0];
+            }
+        } else {
+            // Imbalance is low: simulate and pick team with best balance result
+            let bestImbalance = Infinity;
+
+            for (const teamIdx of teamsWithCapacity) {
+                // Check if this assignment violates separate rules
+                if (violatesSeparate(teamIdx, player.name)) continue;
+
+                // Simulate assignment and calculate resulting imbalance
+                const simulatedTeamOps = getTeamTotalOps(teams[teamIdx]) + player.ops;
+                
+                // Calculate what the imbalance would be after this assignment
+                let maxOps = simulatedTeamOps;
+                let minOps = simulatedTeamOps;
+                
+                for (let i = 0; i < nTeams; i++) {
+                    const currentOps = getTeamTotalOps(teams[i]);
+                    if (i !== teamIdx) {
+                        maxOps = Math.max(maxOps, currentOps);
+                        minOps = Math.min(minOps, currentOps);
+                    }
+                }
+                
+                const imbalance = maxOps - minOps;
+                
+                // Prefer the team that results in lowest imbalance
+                if (imbalance < bestImbalance) {
+                    bestImbalance = imbalance;
+                    bestTeamIdx = teamIdx;
+                }
+            }
+
+            // If no team satisfies separate rules, pick the lowest OPS team with capacity
+            if (bestTeamIdx === -1) {
+                bestTeamIdx = teamsWithCapacity.reduce((lowestIdx, idx) =>
+                    getTeamTotalOps(teams[idx]) < getTeamTotalOps(teams[lowestIdx]) ? idx : lowestIdx
+                );
             }
         }
 
-        // If all teams violate, just assign to the lowest OPS team with capacity anyway
-        if (!assigned && teamIndices.length > 0) {
-            assignPlayerToTeam(teams, player, teamIndices[0], assignedNames);
+        if (bestTeamIdx !== -1) {
+            assignPlayerToTeam(teams, player, bestTeamIdx, assignedNames);
         }
     }
 
