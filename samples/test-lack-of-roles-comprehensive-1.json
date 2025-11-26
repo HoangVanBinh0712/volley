@@ -1,0 +1,23 @@
+{
+  "scenario": "Auto Balance: Simultaneous Shortage (Setter, Spiker, Libero)",
+  "nTeams": 4,
+  "togetherGroups": [],
+  "separateGroups": [],
+  "players": [
+    { "nickName": "M_S", "name": "Main_Setter_S", "position": "Setter", "position_tier": { "tier": "S", "score": 95 }, "sub_position": "Flex", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "M_SP", "name": "Main_Spiker_S", "position": "Spiker", "position_tier": { "tier": "S", "score": 95 }, "sub_position": "Flex", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "M_L", "name": "Main_Libero_S", "position": "Libero", "position_tier": { "tier": "S", "score": 95 }, "sub_position": "Flex", "sub_position_tier": { "tier": "C", "score": 35 } },
+
+    { "nickName": "Sub_S1", "name": "Sub_Setter_A", "position": "Spiker", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "Setter", "sub_position_tier": { "tier": "A", "score": 75 } },
+    { "nickName": "Sub_S2", "name": "Sub_Setter_B", "position": "Libero", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "Setter", "sub_position_tier": { "tier": "B", "score": 55 } },
+    { "nickName": "Sub_S3", "name": "Sub_Setter_C", "position": "Flex", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "Setter", "sub_position_tier": { "tier": "B", "score": 55 } },
+
+    { "nickName": "Sub_SP1", "name": "Sub_Spiker_A", "position": "Setter", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "Spiker", "sub_position_tier": { "tier": "A", "score": 75 } },
+    { "nickName": "Sub_SP2", "name": "Sub_Spiker_B", "position": "Libero", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "Spiker", "sub_position_tier": { "tier": "B", "score": 55 } },
+    { "nickName": "Sub_SP3", "name": "Sub_Spiker_C", "position": "Flex", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "Spiker", "sub_position_tier": { "tier": "B", "score": 55 } },
+
+    { "nickName": "Sub_L1", "name": "Sub_Libero_A", "position": "Setter", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "Libero", "sub_position_tier": { "tier": "A", "score": 75 } },
+    { "nickName": "Sub_L2", "name": "Sub_Libero_B", "position": "Spiker", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "Libero", "sub_position_tier": { "tier": "B", "score": 55 } },
+    { "nickName": "Sub_L3", "name": "Sub_Libero_C", "position": "Flex", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "Libero", "sub_position_tier": { "tier": "B", "score": 55 } }
+  ]
+}

@@ -2,26 +2,7 @@
  * Constants for Volleyball Team Divider
  */
 
-export const ROLE_OPTIONS = ["Cong_chinh", "Chuyen", "Libero", "Cong_thu"];
-
-export const MOCK_DATA = {
-    "players": [
-        { "name": "Mạnh", "position": "Cong_chinh", "sub_position": "Chuyen", "chuyen": 7.5, "cong": 9, "thu": 7.5 },
-        { "name": "Vũ", "position": "Cong_thu", "sub_position": "Cong_chinh", "chuyen": 5, "cong": 7.5, "thu": 6 },
-        { "name": "Bình", "position": "Cong_thu", "sub_position": "Cong_chinh", "chuyen": 6, "cong": 7.5, "thu": 7.5 },
-        { "name": "Thiện", "position": "Chuyen", "sub_position": "Cong_chinh", "chuyen": 8, "cong": 7.5, "thu": 7.5 },
-        { "name": "Tân", "position": "Cong_thu", "sub_position": "Cong_chinh", "chuyen": 6, "cong": 7.5, "thu": 7 },
-        { "name": "Đạt", "position": "Cong_chinh", "sub_position": "Libero", "chuyen": 6.5, "cong": 8, "thu": 7.5 },
-        { "name": "Long Zu Bu", "position": "Cong_chinh", "sub_position": "Cong_thu", "chuyen": 5, "cong": 9, "thu": 6 },
-        { "name": "Ý", "position": "Cong_thu", "sub_position": "", "chuyen": 6.5, "cong": 7, "thu": 6 },
-        { "name": "My", "position": "Cong_thu", "sub_position": "", "chuyen": 5, "cong": 5, "thu": 6 },
-        { "name": "Tuyền", "position": "Libero", "sub_position": "", "chuyen": 5, "cong": 5, "thu": 8 },
-        { "name": "Thức", "position": "Chuyen", "sub_position": "Libero", "chuyen": 9, "cong": 7.5, "thu": 7.5 },
-        { "name": "Ngọc", "position": "Cong_thu", "sub_position": "", "chuyen": 5, "cong": 5, "thu": 7 }
-    ],
-    "chung": [["Thức", "Thiện"]], 
-    "rieng": [["Mạnh", "Đạt"]]
-};
+export const ROLE_OPTIONS = ["Setter", "Spiker", "Flex", "Libero"];
 
 export const TAILWIND_STYLES = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');

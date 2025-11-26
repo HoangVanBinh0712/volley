@@ -1,46 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Player, isAdvancePlayer } from '@/app/types/volleyball';
-import { isValidAdvancePlayerData, isValidBasicPlayerData } from '@/app/utils/volleyUtils';
-import { MOCK_DATA, TAILWIND_STYLES } from '@/app/constants/volleyConstants';
+import { Player } from '@/app/types/volleyball';
+import { isValidBasicPlayerData, normalizePlayerPositions } from '../utils/volleyUtils';
+import { TAILWIND_STYLES } from '@/app/constants/volleyConstants';
 import DivideTab from './DivideTab';
 import EditTab from './EditTab';
 
 interface Constraints {
-    chung: string[][];
-    rieng: string[][];
+    togetherGroups: string[][];
+    separateGroups: string[][];
 }
 
 export default function VolleyDivider() {
     const [loadedPlayers, setLoadedPlayers] = useState<Player[]>([]);
     const [editablePlayers, setEditablePlayers] = useState<Player[]>([]);
-    const [loadedConstraints, setLoadedConstraints] = useState<Constraints>({ chung: [], rieng: [] });
+    const [loadedConstraints, setLoadedConstraints] = useState<Constraints>({ togetherGroups: [], separateGroups: [] });
+    const [numTeams, setNumTeams] = useState<number>(0);
     const [activeTab, setActiveTab] = useState('divide-tab');
     const [loadFileText, setLoadFileText] = useState('📂 Tải File Người Chơi (.json)');
-    const [mode, setMode] = useState<'advance' | 'basic'>('basic');
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
-
-    // Initialize with mock data
-    useEffect(() => {
-        const data = MOCK_DATA;
-        setLoadedPlayers(data.players);
-        setEditablePlayers(data.players.map((p, index) => {
-            const player = { ...p, id: index };
-            if (isAdvancePlayer(player)) {
-                return {
-                    ...player,
-                    chuyen: player.chuyen || 0,
-                    cong: player.cong || 0,
-                    thu: player.thu || 0,
-                };
-            }
-            return player;
-        }));
-        setLoadedConstraints({ chung: data.chung || [], rieng: data.rieng || [] });
-        setLoadFileText(`📂 Đã Tải File Demo (${data.players.length} người)`);
-    }, []);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -51,33 +31,32 @@ export default function VolleyDivider() {
             try {
                 const data = JSON.parse(e.target?.result as string);
                 
-                // Validate based on selected mode
-                const isValid = mode === 'advance' 
-                    ? isValidAdvancePlayerData(data)
-                    : isValidBasicPlayerData(data);
-                
+                // Normalize positions in the loaded JSON before validation
+                const normalized = { ...data, players: normalizePlayerPositions(data.players || []) };
+
+                const isValid = isValidBasicPlayerData(normalized);
+
                 if (isValid) {
-                    setLoadedPlayers(data.players);
-                    setEditablePlayers(data.players.map((p: Player, index: number) => {
-                        const player = { ...p, id: index };
-                        if (isAdvancePlayer(player)) {
-                            return {
-                                ...player,
-                                chuyen: player.chuyen || 0,
-                                cong: player.cong || 0,
-                                thu: player.thu || 0,
-                            };
-                        }
-                        return player;
-                    }));
-                    setLoadedConstraints({ chung: data.chung || [], rieng: data.rieng || [] });
+                    setLoadedPlayers(normalized.players);
+                    setEditablePlayers(normalized.players.map((p: Player, index: number) => ({
+                        ...p,
+                        id: index
+                    })));
+                    // support both old keys and new keys in imported JSON
+                    setLoadedConstraints({
+                        togetherGroups: data.togetherGroups || data.chung || [],
+                        separateGroups: data.separateGroups || data.rieng || []
+                    });
+                    // set number of teams from import if provided
+                    if (typeof data.nTeams === 'number' && data.nTeams > 0) {
+                        setNumTeams(data.nTeams);
+                    }
                     setLoadFileText(`📂 Đã Tải File (${data.players.length} người)`);
                     setSuccessMessage(`✅ Tải file thành công!\n👥 ${data.players.length} người chơi đã được nạp`);
                     setShowSuccessPopup(true);
                     setTimeout(() => setShowSuccessPopup(false), 3000);
                 } else {
-                    const modeText = mode === 'advance' ? 'Advance (chuyen, cong, thu)' : 'Basic (position_tier, sub_position_tier)';
-                    alert(`Lỗi: File JSON không hợp lệ với chế độ ${modeText}. Vui lòng kiểm tra định dạng dữ liệu.`);
+                    alert(`Lỗi: File JSON không hợp lệ với chế độ Basic (position_tier, sub_position_tier). Vui lòng kiểm tra định dạng dữ liệu.`);
                 }
             } catch (error) {
                 alert('Lỗi đọc/phân tích JSON: ' + (error instanceof Error ? error.message : 'Unknown error'));
@@ -95,31 +74,28 @@ export default function VolleyDivider() {
             try {
                 const data = JSON.parse(e.target?.result as string);
                 
-                // Validate based on selected mode
-                const isValid = mode === 'advance' 
-                    ? isValidAdvancePlayerData(data)
-                    : isValidBasicPlayerData(data);
-                
+                // Normalize positions in the loaded JSON before validation
+                const normalized = { ...data, players: normalizePlayerPositions(data.players || []) };
+
+                const isValid = isValidBasicPlayerData(normalized);
+
                 if (isValid) {
-                    setEditablePlayers(data.players.map((p: Player, index: number) => {
-                        const player = { ...p, id: index };
-                        if (isAdvancePlayer(player)) {
-                            return {
-                                ...player,
-                                chuyen: player.chuyen || 0,
-                                cong: player.cong || 0,
-                                thu: player.thu || 0,
-                            };
-                        }
-                        return player;
-                    }));
-                    setLoadedConstraints({ chung: data.chung || [], rieng: data.rieng || [] });
+                    setEditablePlayers(normalized.players.map((p: Player, index: number) => ({
+                        ...p,
+                        id: index
+                    })));
+                    setLoadedConstraints({
+                        togetherGroups: data.togetherGroups || data.chung || [],
+                        separateGroups: data.separateGroups || data.rieng || []
+                    });
+                    if (typeof data.nTeams === 'number' && data.nTeams > 0) {
+                        setNumTeams(data.nTeams);
+                    }
                     setSuccessMessage(`✅ Tải file thành công!\n👥 ${data.players.length} người chơi đã được nạp`);
                     setShowSuccessPopup(true);
                     setTimeout(() => setShowSuccessPopup(false), 3000);
                 } else {
-                    const modeText = mode === 'advance' ? 'Advance (chuyen, cong, thu)' : 'Basic (position_tier, sub_position_tier)';
-                    alert(`Lỗi: File JSON không hợp lệ với chế độ ${modeText}. Vui lòng kiểm tra định dạng dữ liệu.`);
+                    alert(`Lỗi: File JSON không hợp lệ với chế độ Basic (position_tier, sub_position_tier). Vui lòng kiểm tra định dạng dữ liệu.`);
                 }
             } catch (error) {
                 alert('Lỗi đọc/phân tích JSON: ' + (error instanceof Error ? error.message : 'Unknown error'));
@@ -140,39 +116,6 @@ export default function VolleyDivider() {
                         VOLLEY PRO-DIVIDER
                     </h1>
                     <p className="text-xs sm:text-sm text-gray-600 font-medium mb-4">Hệ thống cân bằng vị trí & chiến lực</p>
-                    
-                    {/* Mode Selector */}
-                    <div className="flex items-center justify-center gap-4 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-700">Chế độ:</span>
-                        <div className="flex gap-3">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="mode"
-                                    value="advance"
-                                    checked={mode === 'advance'}
-                                    onChange={(e) => setMode(e.target.value as 'advance' | 'basic')}
-                                    className="w-4 h-4 cursor-pointer"
-                                />
-                                <span className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">
-                                    ⚡ Advance (Chi Tiết)
-                                </span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="mode"
-                                    value="basic"
-                                    checked={mode === 'basic'}
-                                    onChange={(e) => setMode(e.target.value as 'advance' | 'basic')}
-                                    className="w-4 h-4 cursor-pointer"
-                                />
-                                <span className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">
-                                    ⭐ Basic (Đơn Giản)
-                                </span>
-                            </label>
-                        </div>
-                    </div>
                 </header>
 
                 {/* TABS */}
@@ -205,7 +148,9 @@ export default function VolleyDivider() {
                         loadedPlayers={loadedPlayers}
                         loadFileText={loadFileText}
                         onFileSelect={handleFileSelect}
-                        mode={mode}
+                        numTeams={numTeams}
+                        togetherGroups={loadedConstraints.togetherGroups}
+                        separateGroups={loadedConstraints.separateGroups}
                     />
                 )}
 

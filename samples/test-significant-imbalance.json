@@ -1,0 +1,20 @@
+{
+  "scenario": "Imbalance Test (1 Super Player)",
+  "nTeams": 2,
+  "togetherGroups": [],
+  "separateGroups": [],
+  "players": [
+    { "nickName": "GOD", "name": "God_Player", "position": "Spiker", "position_tier": { "tier": "S", "score": 95 }, "sub_position": "Setter", "sub_position_tier": { "tier": "S", "score": 95 } },
+    { "nickName": "AVG1", "name": "Average_1", "position": "Setter", "position_tier": { "tier": "C+", "score": 45 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "AVG2", "name": "Average_2", "position": "Setter", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "AVG3", "name": "Average_3", "position": "Spiker", "position_tier": { "tier": "C+", "score": 45 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "AVG4", "name": "Average_4", "position": "Spiker", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "AVG5", "name": "Average_5", "position": "Libero", "position_tier": { "tier": "C+", "score": 45 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "AVG6", "name": "Average_6", "position": "Libero", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "W1", "name": "Weak_1", "position": "Spiker", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "W2", "name": "Weak_2", "position": "Setter", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "W3", "name": "Weak_3", "position": "Libero", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "W4", "name": "Weak_4", "position": "Flex", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "W5", "name": "Weak_5", "position": "Flex", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } }
+  ]
+}

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Player, isAdvancePlayer } from '@/app/types/volleyball';
-import { exportPlayersToJSON } from '@/app/utils/volleyUtils';
+import { Player } from '@/app/types/volleyball';
+import { exportPlayersToJSON } from '../utils/volleyUtils';
 import { ROLE_OPTIONS } from '@/app/constants/volleyConstants';
 
 interface EditTabProps {
     editablePlayers: Player[];
-    loadedConstraints: { chung: string[][]; rieng: string[][] };
+    loadedConstraints: { togetherGroups: string[][]; separateGroups: string[][] };
     onFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onUpdatePlayers: (players: Player[]) => void;
 }
@@ -76,13 +76,6 @@ export default function EditTab({
                                     <th className="px-3 py-3 text-left text-xs font-bold uppercase">Tên</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold uppercase">Vị trí</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold uppercase">Vị trí phụ</th>
-                                    {editablePlayers.length > 0 && isAdvancePlayer(editablePlayers[0]) && (
-                                        <>
-                                            <th className="px-3 py-3 text-left text-xs font-bold uppercase">Chuyền</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold uppercase">Công</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold uppercase">Thủ</th>
-                                        </>
-                                    )}
                                     <th className="px-3 py-3 text-center text-xs font-bold uppercase">Hành động</th>
                                 </tr>
                             </thead>
@@ -136,55 +129,6 @@ export default function EditTab({
                                                 <span className="text-sm">{p.sub_position || '—'}</span>
                                             )}
                                         </td>
-                                        {isAdvancePlayer(p) && (
-                                            <>
-                                                <td className="px-3 py-3 whitespace-nowrap">
-                                                    {editingRowId === p.id ? (
-                                                        <input
-                                                            type="number"
-                                                            step="0.5"
-                                                            min="0"
-                                                            max="10"
-                                                            value={p.chuyen}
-                                                            onChange={(e) => updatePlayerField(p.id!, 'chuyen', parseFloat(e.target.value) || 0)}
-                                                            className="editable-input"
-                                                        />
-                                                    ) : (
-                                                        <span className="font-medium text-indigo-600">{p.chuyen}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-3 py-3 whitespace-nowrap">
-                                                    {editingRowId === p.id ? (
-                                                        <input
-                                                            type="number"
-                                                            step="0.5"
-                                                            min="0"
-                                                            max="10"
-                                                            value={p.cong}
-                                                            onChange={(e) => updatePlayerField(p.id!, 'cong', parseFloat(e.target.value) || 0)}
-                                                            className="editable-input"
-                                                        />
-                                                    ) : (
-                                                        <span className="font-medium text-indigo-600">{p.cong}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-3 py-3 whitespace-nowrap">
-                                                    {editingRowId === p.id ? (
-                                                        <input
-                                                            type="number"
-                                                            step="0.5"
-                                                            min="0"
-                                                            max="10"
-                                                            value={p.thu}
-                                                            onChange={(e) => updatePlayerField(p.id!, 'thu', parseFloat(e.target.value) || 0)}
-                                                            className="editable-input"
-                                                        />
-                                                    ) : (
-                                                        <span className="font-medium text-indigo-600">{p.thu}</span>
-                                                    )}
-                                                </td>
-                                            </>
-                                        )}
                                         <td className="px-3 py-3 text-center">
                                             <div className="flex justify-center space-x-2">
                                                 {editingRowId === p.id ? (

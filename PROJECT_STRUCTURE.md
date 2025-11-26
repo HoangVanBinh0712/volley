@@ -104,7 +104,7 @@
             │   • calculateTeamBalance(teams)
             │
             │   🎯 Team Division:
-            │   • generateMockResults(nTeams, players)
+            │   • generateResults(nTeams, players)
             │   • generateBalancedTeams(nTeams, players)
             │
             │   ✔️ Validation:

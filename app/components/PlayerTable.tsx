@@ -1,16 +1,15 @@
 'use client';
 
-import { Player, isAdvancePlayer, isBasicPlayer } from '@/app/types/volleyball';
-import { calculateOPS, calculateBasicOPS } from '@/app/utils/volleyUtils';
+import { Player, isBasicPlayer } from '@/app/types/volleyball';
+import { calculateBasicOPS } from '../utils/volleyUtils';
 
 interface PlayerTableProps {
     players: Player[];
     title: string;
     showOPS?: boolean;
-    mode?: 'advance' | 'basic';
 }
 
-export default function PlayerTable({ players, title, showOPS = true, mode = 'advance' }: PlayerTableProps) {
+export default function PlayerTable({ players, title, showOPS = true }: PlayerTableProps) {
     if (players.length === 0) {
         return null;
     }
@@ -25,7 +24,7 @@ export default function PlayerTable({ players, title, showOPS = true, mode = 'ad
                         <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Vị trí Phụ</th>
                         {showOPS && (
                             <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
-                                {mode === 'basic' ? 'Cấp Độ' : 'OPS'}
+                                Cấp Độ
                             </th>
                         )}
                     </tr>
@@ -40,9 +39,9 @@ export default function PlayerTable({ players, title, showOPS = true, mode = 'ad
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{p.sub_position || '—'}</td>
                             {showOPS && (
                                 <td className="px-4 py-3 whitespace-nowrap font-bold text-indigo-600">
-                                    {mode === 'basic' && isBasicPlayer(p) 
+                                    {isBasicPlayer(p) 
                                         ? `${p.position_tier.tier}` 
-                                        : isAdvancePlayer(p) ? calculateOPS(p).toFixed(2) : calculateBasicOPS(p).toFixed(2)
+                                        : calculateBasicOPS(p).toFixed(2)
                                     }
                                 </td>
                             )}

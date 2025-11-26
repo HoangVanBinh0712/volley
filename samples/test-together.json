@@ -1,0 +1,23 @@
+{
+  "scenario": "Together Group Test (12 Players)",
+  "nTeams": 2,
+  "togetherGroups": [
+    ["Alice_Setter", "Bob_Newbie"],
+    ["Duo_1", "Duo_2"]
+  ],
+  "separateGroups": [],
+  "players": [
+    { "nickName": "Ali", "name": "Alice_Setter", "position": "Setter", "position_tier": { "tier": "S", "score": 95 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "Bob", "name": "Bob_Newbie", "position": "Spiker", "position_tier": { "tier": "C", "score": 35 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "D1", "name": "Duo_1", "position": "Libero", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "D2", "name": "Duo_2", "position": "Spiker", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P5", "name": "Player_5", "position": "Setter", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P6", "name": "Player_6", "position": "Spiker", "position_tier": { "tier": "A", "score": 75 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P7", "name": "Player_7", "position": "Libero", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P8", "name": "Player_8", "position": "Flex", "position_tier": { "tier": "B+", "score": 65 }, "sub_position": "Spiker", "sub_position_tier": { "tier": "B", "score": 55 } },
+    { "nickName": "P9", "name": "Player_9", "position": "Spiker", "position_tier": { "tier": "C+", "score": 45 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P10", "name": "Player_10", "position": "Setter", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P11", "name": "Player_11", "position": "Spiker", "position_tier": { "tier": "A+", "score": 85 }, "sub_position": "", "sub_position_tier": { "tier": "C", "score": 35 } },
+    { "nickName": "P12", "name": "Player_12", "position": "Flex", "position_tier": { "tier": "B", "score": 55 }, "sub_position": "Setter", "sub_position_tier": { "tier": "B", "score": 55 } }
+  ]
+}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Player, Team } from '@/app/types/volleyball';
-import { generateMockResults } from '@/app/utils/volleyUtils';
+import { generateResults } from '../utils/volleyUtils';
 import PlayerTable from './PlayerTable';
 import ResultsTable from './ResultsTable';
 
@@ -10,21 +10,24 @@ interface DivideTabProps {
     loadedPlayers: Player[];
     loadFileText: string;
     onFileSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    mode?: 'advance' | 'basic';
+    numTeams: number;
+    togetherGroups?: string[][];
+    separateGroups?: string[][];
 }
 
-export default function DivideTab({ loadedPlayers, loadFileText, onFileSelect, mode = 'advance' }: DivideTabProps) {
-    const [numTeams, setNumTeams] = useState(2);
+export default function DivideTab({ loadedPlayers, loadFileText, onFileSelect, numTeams, togetherGroups = [], separateGroups = [] }: DivideTabProps) {
     const [results, setResults] = useState<Team[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [randomize, setRandomize] = useState<boolean>(false);
+    const [strategy, setStrategy] = useState<string>('v1');
 
     const startDivision = () => {
         setIsLoading(true);
-        setTimeout(() => {
-            const mockResult = generateMockResults(numTeams, loadedPlayers, mode);
+            setTimeout(() => {
+            const mockResult = generateResults(numTeams, loadedPlayers, togetherGroups, separateGroups, randomize, strategy);
             setResults(mockResult);
             setIsLoading(false);
-        }, 1500);
+        }, 500);
     };
 
     return (
@@ -46,25 +49,37 @@ export default function DivideTab({ loadedPlayers, loadFileText, onFileSelect, m
                         <span className="text-sm sm:text-base">{loadFileText}</span>
                     </label>
 
-                    <div className="flex items-center bg-linear-to-r from-gray-100 to-gray-50 p-3 rounded-xl border border-gray-200">
-                        <label htmlFor="numTeams" className="text-gray-700 font-semibold text-sm mr-2 whitespace-nowrap">
-                            Số đội:
-                        </label>
-                        <input
-                            type="number"
-                            id="numTeams"
-                            value={numTeams}
-                            onChange={(e) => setNumTeams(Math.max(2, Math.min(10, parseInt(e.target.value) || 2)))}
-                            min="2"
-                            max="10"
-                            className="w-16 p-2 border-2 border-gray-300 rounded-lg text-center text-gray-800 font-semibold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                        />
-                    </div>
+                        <div className="flex items-center bg-linear-to-r from-gray-100 to-gray-50 p-3 rounded-xl border border-gray-200 space-x-4">
+                            <div className="flex items-center">
+                                <label className="text-gray-700 font-semibold text-sm mr-2 whitespace-nowrap">Số đội:</label>
+                                <span className="font-bold text-indigo-600">{numTeams >= 2 ? numTeams : '—'}</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <label className="flex items-center text-sm gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={randomize}
+                                        onChange={(e) => setRandomize(e.target.checked)}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-gray-700 font-medium">Random</span>
+                                </label>
+
+                                <label className="flex items-center text-sm gap-2">
+                                    <span className="text-gray-700 font-medium mr-2">Strategy</span>
+                                    <select value={strategy} onChange={(e) => setStrategy(e.target.value)} className="p-1 rounded border">
+                                        <option value="v1">v1 (default)</option>
+                                        <option value="v2">v2 (alt)</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
                 </div>
 
                 <button
                     onClick={startDivision}
-                    disabled={loadedPlayers.length === 0}
+                    disabled={loadedPlayers.length === 0 || numTeams < 2}
                     className="w-full py-4 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-extrabold text-lg rounded-xl shadow-lg hover:shadow-xl disabled:shadow-none transition duration-200 btn-hover disabled:cursor-not-allowed"
                 >
                     ▶️ CHIA ĐỘI NGAY!
@@ -76,7 +91,7 @@ export default function DivideTab({ loadedPlayers, loadFileText, onFileSelect, m
                 <h2 className="text-lg sm:text-xl font-bold text-gray-800 border-l-4 border-red-500 pl-4">
                     2️⃣ Danh Sách Đã Tải
                 </h2>
-                {loadedPlayers.length > 0 && <PlayerTable players={loadedPlayers} title="Players" mode={mode} />}
+                {loadedPlayers.length > 0 && <PlayerTable players={loadedPlayers} title="Players" />}
                 <p className="text-sm font-medium text-gray-600 bg-gray-50 p-3 rounded-lg">
                     👥 Tổng số người chơi: <span className="font-bold text-indigo-600">{loadedPlayers.length}</span>
                 </p>
@@ -94,7 +109,7 @@ export default function DivideTab({ loadedPlayers, loadFileText, onFileSelect, m
                             <p className="text-lg font-semibold text-indigo-700">Đang xử lý thuật toán chia đội...</p>
                         </div>
                     ) : (
-                        <ResultsTable teams={results} mode={mode} />
+                        <ResultsTable teams={results} />
                     )}
                 </div>
             </section>
