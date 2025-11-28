@@ -778,18 +778,6 @@ function divideTeamsBasicV2(
 }
 
 /**
- * Validates and normalizes positions in player data
- * Converts old Vietnamese position names to standard ones
- */
-export function normalizePlayerPositions(players: any[]): Player[] {
-    return players.map(p => ({
-        ...p,
-        position: normalizeRole(p.position),
-        sub_position: normalizeRole(p.sub_position || '')
-    }));
-}
-
-/**
  * Calculates balance metric for team division
  * Returns the difference between strongest and weakest team
  */
@@ -798,73 +786,4 @@ export function calculateTeamBalance(teams: Team[]): number {
     
     const opsValues = teams.map(t => getTeamTotalOps(t));
     return Math.max(...opsValues) - Math.min(...opsValues);
-}
-
-/**
- * Validates if data is valid BasicPlayer format
- */
-export function isValidBasicPlayerData(data: any): boolean {
-    return (
-        data &&
-        Array.isArray(data.players) &&
-        data.players.length > 0 &&
-        data.players.every((p: any) =>
-            typeof p.name === 'string' &&
-            typeof p.position === 'string' &&
-            typeof p.position_tier === 'string' &&
-            typeof p.sub_position === 'string' &&
-            typeof p.sub_position_tier === 'string'
-        )
-    );
-}
-
-/**
- * Exports team data to JSON format
- */
-export function exportTeamsToJSON(teams: Team[], filename: string = 'teams.json'): void {
-    const data = JSON.stringify(teams, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-/**
- * Exports player data to JSON format
- */
-export function exportPlayersToJSON(players: Player[], constraints: any, filename: string = 'players.json'): void {
-    const cleanedPlayers = players.map(p => {
-        return {
-            nickName: (p as BasicPlayer).nickName || '',
-            name: p.name,
-            position: p.position,
-            position_tier: (p as BasicPlayer).position_tier,
-            sub_position: p.sub_position,
-            sub_position_tier: (p as BasicPlayer).sub_position_tier
-        };
-    });
-
-    const exportData = {
-        players: cleanedPlayers,
-        togetherGroups: constraints.togetherGroups || [],
-        separateGroups: constraints.separateGroups || []
-    };
-
-    const jsonString = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 }

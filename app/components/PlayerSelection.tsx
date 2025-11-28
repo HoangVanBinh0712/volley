@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { BasicPlayer } from '@/app/types/volleyball';
 import { fetchAllPlayers } from '@/app/lib/playerQueries';
+import { useToast } from './ToastProvider';
 
 interface PlayerSelectionProps {
     onPlayersSelected: (players: BasicPlayer[]) => void;
@@ -14,6 +15,7 @@ export default function PlayerSelection({ onPlayersSelected }: PlayerSelectionPr
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showTable, setShowTable] = useState(false);
+    const { showToast } = useToast();
 
     /**
      * Load all players from database
@@ -26,20 +28,25 @@ export default function PlayerSelection({ onPlayersSelected }: PlayerSelectionPr
             console.log('Loaded players:', fetchedPlayers);
             setPlayers(fetchedPlayers);
             setShowTable(true);
+            
             if (fetchedPlayers.length === 0) {
                 setError('No players found. Check RLS policies in Supabase or verify table has data.');
+                showToast('Không tìm thấy người chơi nào trong cơ sở dữ liệu!', 'warning');
+            } else {
+                showToast(`Đã tải ${fetchedPlayers.length} người chơi từ cơ sở dữ liệu!`, 'success');
             }
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : 'Failed to load players';
             console.error('Full error:', err);
             setError(errorMsg);
+            showToast('Lỗi tải người chơi: ' + errorMsg, 'error');
         } finally {
             setLoading(false);
         }
     };
 
     /**
-     * Toggle player selection
+     * Toggle player selection and auto-update
      */
     const togglePlayer = (id: number | undefined) => {
         if (id === undefined) return;
@@ -50,26 +57,27 @@ export default function PlayerSelection({ onPlayersSelected }: PlayerSelectionPr
             newSelected.add(id);
         }
         setSelectedIds(newSelected);
+        
+        // Auto-update parent with selected players
+        const selected = players.filter(p => p.id !== undefined && newSelected.has(p.id));
+        onPlayersSelected(selected);
     };
 
     /**
-     * Select/deselect all players
+     * Select/deselect all players and auto-update
      */
     const toggleSelectAll = () => {
+        let newSelected: Set<number>;
         if (selectedIds.size === players.length) {
-            setSelectedIds(new Set());
+            newSelected = new Set();
+            setSelectedIds(newSelected);
+            onPlayersSelected([]);
         } else {
-            setSelectedIds(new Set(players.map(p => p.id).filter(id => id !== undefined) as number[]));
+            newSelected = new Set(players.map(p => p.id).filter(id => id !== undefined) as number[]);
+            setSelectedIds(newSelected);
+            const selected = players.filter(p => p.id !== undefined && newSelected.has(p.id));
+            onPlayersSelected(selected);
         }
-    };
-
-    /**
-     * Confirm selection and pass to parent component
-     */
-    const handleConfirmSelection = () => {
-        const selected = players.filter(p => p.id !== undefined && selectedIds.has(p.id));
-        onPlayersSelected(selected);
-        // Keep table open for re-selection
     };
 
     return (
@@ -108,16 +116,11 @@ export default function PlayerSelection({ onPlayersSelected }: PlayerSelectionPr
                                 {selectedIds.size === players.length ? '✓ Deselect All' : '○ Select All'}
                             </button>
                             <button
-                                onClick={handleConfirmSelection}
-                                disabled={selectedIds.size === 0}
-                                className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
-                            >
-                                ✅ Confirm ({selectedIds.size})
-                            </button>
-                            <button
                                 onClick={() => {
                                     setShowTable(false);
                                     setSelectedIds(new Set());
+                                    onPlayersSelected([]);
+                                    showToast('Đã đặt lại lựa chọn!', 'info');
                                 }}
                                 className="flex-1 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                             >

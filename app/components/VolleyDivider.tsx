@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Player } from '@/app/types/volleyball';
-import { isValidBasicPlayerData, normalizePlayerPositions } from '../utils/volleyUtils';
+import { useState } from 'react';
+import { Player, Team } from '@/app/types/volleyball';
 import { TAILWIND_STYLES } from '@/app/constants/volleyConstants';
 import DivideTab from './DivideTab';
 import EditTab from './EditTab';
@@ -13,95 +12,12 @@ interface Constraints {
 }
 
 export default function VolleyDivider() {
-    const [loadedPlayers, setLoadedPlayers] = useState<Player[]>([]);
     const [editablePlayers, setEditablePlayers] = useState<Player[]>([]);
     const [loadedConstraints, setLoadedConstraints] = useState<Constraints>({ togetherGroups: [], separateGroups: [] });
-    const [numTeams, setNumTeams] = useState<number>(0);
     const [activeTab, setActiveTab] = useState('divide-tab');
-    const [loadFileText, setLoadFileText] = useState('📂 Tải File Người Chơi (.json)');
-    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
 
-    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target?.result as string);
-                
-                // Normalize positions in the loaded JSON before validation
-                const normalized = { ...data, players: normalizePlayerPositions(data.players || []) };
-
-                const isValid = isValidBasicPlayerData(normalized);
-
-                if (isValid) {
-                    setLoadedPlayers(normalized.players);
-                    setEditablePlayers(normalized.players.map((p: Player, index: number) => ({
-                        ...p,
-                        id: index
-                    })));
-                    // support both old keys and new keys in imported JSON
-                    setLoadedConstraints({
-                        togetherGroups: data.togetherGroups || data.chung || [],
-                        separateGroups: data.separateGroups || data.rieng || []
-                    });
-                    // set number of teams from import if provided
-                    if (typeof data.nTeams === 'number' && data.nTeams > 0) {
-                        setNumTeams(data.nTeams);
-                    }
-                    setLoadFileText(`📂 Đã Tải File (${data.players.length} người)`);
-                    setSuccessMessage(`✅ Tải file thành công!\n👥 ${data.players.length} người chơi đã được nạp`);
-                    setShowSuccessPopup(true);
-                    setTimeout(() => setShowSuccessPopup(false), 3000);
-                } else {
-                    alert(`Lỗi: File JSON không hợp lệ với chế độ Basic (position_tier, sub_position_tier). Vui lòng kiểm tra định dạng dữ liệu.`);
-                }
-            } catch (error) {
-                alert('Lỗi đọc/phân tích JSON: ' + (error instanceof Error ? error.message : 'Unknown error'));
-            }
-        };
-        reader.readAsText(file);
-    };
-
-    const handleFileSelectEdit = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target?.result as string);
-                
-                // Normalize positions in the loaded JSON before validation
-                const normalized = { ...data, players: normalizePlayerPositions(data.players || []) };
-
-                const isValid = isValidBasicPlayerData(normalized);
-
-                if (isValid) {
-                    setEditablePlayers(normalized.players.map((p: Player, index: number) => ({
-                        ...p,
-                        id: index
-                    })));
-                    setLoadedConstraints({
-                        togetherGroups: data.togetherGroups || data.chung || [],
-                        separateGroups: data.separateGroups || data.rieng || []
-                    });
-                    if (typeof data.nTeams === 'number' && data.nTeams > 0) {
-                        setNumTeams(data.nTeams);
-                    }
-                    setSuccessMessage(`✅ Tải file thành công!\n👥 ${data.players.length} người chơi đã được nạp`);
-                    setShowSuccessPopup(true);
-                    setTimeout(() => setShowSuccessPopup(false), 3000);
-                } else {
-                    alert(`Lỗi: File JSON không hợp lệ với chế độ Basic (position_tier, sub_position_tier). Vui lòng kiểm tra định dạng dữ liệu.`);
-                }
-            } catch (error) {
-                alert('Lỗi đọc/phân tích JSON: ' + (error instanceof Error ? error.message : 'Unknown error'));
-            }
-        };
-        reader.readAsText(file);
+    const handleDatabasePlayersSelected = (players: Player[]) => {
+        setEditablePlayers(players);
     };
 
     return (
@@ -130,8 +46,7 @@ export default function VolleyDivider() {
                         >
                             ⚔️ Chia Đội
                         </button>
-                        {/* Edit Tab - Hidden for future release */}
-                        {/* <button
+                        <button
                             type="button"
                             onClick={() => setActiveTab('edit-tab')}
                             className={`tab-button px-4 sm:px-6 py-3 font-semibold text-sm sm:text-base transition duration-200 ease-in-out whitespace-nowrap ${
@@ -139,19 +54,17 @@ export default function VolleyDivider() {
                             }`}
                         >
                             ✏️ Chỉnh Sửa
-                        </button> */}
+                        </button>
                     </nav>
                 </div>
 
                 {/* TAB CONTENT */}
                 {activeTab === 'divide-tab' && (
                     <DivideTab
-                        loadedPlayers={loadedPlayers}
-                        loadFileText={loadFileText}
-                        onFileSelect={handleFileSelect}
-                        numTeams={numTeams}
                         togetherGroups={loadedConstraints.togetherGroups}
                         separateGroups={loadedConstraints.separateGroups}
+                        onPlayersLoaded={handleDatabasePlayersSelected}
+                        loadedPlayers={editablePlayers}
                     />
                 )}
 
@@ -159,27 +72,8 @@ export default function VolleyDivider() {
                     <EditTab
                         editablePlayers={editablePlayers}
                         loadedConstraints={loadedConstraints}
-                        onFileSelect={handleFileSelectEdit}
                         onUpdatePlayers={setEditablePlayers}
                     />
-                )}
-
-                {/* Success Toast Popup */}
-                {showSuccessPopup && (
-                    <div className="fixed top-4 right-4 z-50 animate-slide-in">
-                        <div className="bg-white rounded-lg shadow-2xl p-4 max-w-sm border-l-4 border-green-500">
-                            <div className="flex items-start gap-3">
-                                <div className="text-2xl">✅</div>
-                                <div className="space-y-1">
-                                    {successMessage.split('\n').map((line, idx) => (
-                                        <p key={idx} className={idx === 0 ? "font-semibold text-gray-800" : "text-sm text-gray-600"}>
-                                            {line}
-                                        </p>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 )}
             </div>
         </div>
