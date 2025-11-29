@@ -41,7 +41,7 @@ export default function VolleyDivider() {
                             </h1>
                             <p className="text-xs sm:text-sm text-gray-600 font-medium mb-2">Hệ thống cân bằng vị trí & chiến lực</p>
                             <div className="text-xs sm:text-sm text-gray-600">
-                                Sponsor by Bềnh Ka - <a href="https://www.facebook.com/vanbinh0712" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-semibold underline">Contact me</a>
+                                Created by Bềnh Ka - <a href="https://www.facebook.com/vanbinh0712" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-semibold underline">Contact me</a>
                             </div>
                         </div>
                     </div>
