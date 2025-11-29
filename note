@@ -1,0 +1,20 @@
+"1️⃣ Điều Khiển & Tải Dữ Liệu" - Main control section containing:
+
+"📦 Tải từ Cơ Sở Dữ Liệu" - Database player selection subsection
+"👥 Số Đội" - Team count selector
+"🎲 Chế Độ Random" - Random toggle
+ConstraintManager component (Ràng Buộc Người Chơi)
+"▶️ CHIA ĐỘI NGAY!" - Division button
+"2️⃣ Kết Quả Đội Hình" - Results section
+
+
+"1️⃣ Quản Lý Dữ Liệu" - Data management section with:
+
+"📥 Tải từ Cơ Sở Dữ Liệu" - Load button
+"💾 Lưu Thay Đổi" - Save changes button
+"2️⃣ Chỉnh Sửa Dữ Liệu" - Edit data table section
+
+
+"🔗 Ràng Buộc Người Chơi" - Main constraints container with:
+"👥 Together Groups (Cùng Đội)" - Together groups section
+"✖️ Separate Groups (Khác Đội)" - Separate groups section

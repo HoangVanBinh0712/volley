@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VOLLEY PRO-DIVIDER",
-  description: "Created By Bềnh Ka",
+  title: "Chia Đội Bóng Chuyền",
+  description: "Created By Bềnh Ka"
 };
 
 export default function RootLayout({

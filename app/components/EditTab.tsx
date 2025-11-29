@@ -7,8 +7,6 @@ import { ROLE_OPTIONS } from '@/app/constants/volleyConstants';
 import { useToast } from './ToastProvider';
 
 interface EditTabProps {
-    editablePlayers: Player[];
-    loadedConstraints: { togetherGroups: string[][]; separateGroups: string[][] };
     onUpdatePlayers: (players: Player[]) => void;
 }
 
@@ -45,11 +43,9 @@ const emptyNewPlayer: NewPlayerForm = {
 };
 
 export default function EditTab({
-    editablePlayers,
-    loadedConstraints,
     onUpdatePlayers
 }: EditTabProps) {
-    const [players, setPlayers] = useState<Player[]>(editablePlayers);
+    const [players, setPlayers] = useState<Player[]>([]);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -255,7 +251,7 @@ export default function EditTab({
                         disabled={isLoading || isSaving}
                         className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                     >
-                        {isLoading ? '⟳ Đang tải...' : '📥 Tải từ Cơ Sở Dữ Liệu'}
+                        {isLoading ? '⟳ Đang tải...' : '📥 Tải người chơi'}
                     </button>
                     {(modifiedIds.size > 0 || deletedIds.size > 0 || addedIds.size > 0) && (
                         <button
@@ -286,13 +282,13 @@ export default function EditTab({
                             <table className="w-full divide-y divide-gray-200 text-sm">
                                 <thead className="bg-linear-to-r from-gray-700 to-gray-800 text-white sticky top-0">
                                     <tr>
-                                        <th className="px-2 py-2 text-left text-xs font-bold uppercase">Tên</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold uppercase">Biệt Danh</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold uppercase">Vị Trí</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold uppercase">Cấp Độ</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold uppercase">Vị Trí Phụ</th>
-                                        <th className="px-2 py-2 text-left text-xs font-bold uppercase">Cấp Độ Phụ</th>
-                                        <th className="px-2 py-2 text-center text-xs font-bold uppercase">Hành động</th>
+                                        <th className="px-2 sm:px-4 py-2 text-left text-xs sm:text-sm font-bold uppercase w-32">Tên</th>
+                                        <th className="px-2 sm:px-4 py-2 text-left text-xs sm:text-sm font-bold uppercase w-32">Biệt Danh</th>
+                                        <th className="px-2 sm:px-4 py-2 text-left text-xs sm:text-sm font-bold uppercase w-28">Vị Trí</th>
+                                        <th className="px-2 sm:px-4 py-2 text-left text-xs sm:text-sm font-bold uppercase w-24">Cấp Độ</th>
+                                        <th className="px-2 sm:px-4 py-2 text-left text-xs sm:text-sm font-bold uppercase w-28">Vị Trí Phụ</th>
+                                        <th className="px-2 sm:px-4 py-2 text-left text-xs sm:text-sm font-bold uppercase w-28">Cấp Độ Phụ</th>
+                                        <th className="px-2 sm:px-4 py-2 text-center text-xs sm:text-sm font-bold uppercase w-32">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
@@ -412,37 +408,34 @@ export default function EditTab({
                                                 )}
                                             </td>
                                             <td className="px-2 py-2 text-center">
-                                                <div className="flex justify-center space-x-1">
+                                                <div className="flex justify-center gap-1 flex-wrap">
                                                     {editingRowId === p.id ? (
                                                         <button
                                                             onClick={() => saveRow(p.id!)}
                                                             disabled={isSaving}
-                                                            className="text-green-600 hover:text-green-800 font-bold transition duration-150 btn-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                                                            title="Đóng chỉnh sửa"
+                                                            className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white text-xs sm:text-sm font-semibold rounded-lg transition duration-150 disabled:cursor-not-allowed shadow-sm"
                                                         >
-                                                            ✓
+                                                            Lưu
                                                         </button>
                                                     ) : (
                                                         <button
                                                             onClick={() => editRow(p.id!)}
                                                             disabled={isSaving || deletedIds.has(p.id || 0)}
-                                                            className="text-blue-600 hover:text-blue-800 font-bold transition duration-150 btn-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                                                            title="Sửa"
+                                                            className="px-2 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white text-xs sm:text-sm font-semibold rounded-lg transition duration-150 disabled:cursor-not-allowed shadow-sm"
                                                         >
-                                                            ✎
+                                                            Sửa
                                                         </button>
                                                     )}
                                                     <button
                                                         onClick={() => markForDeletion(p.id!)}
                                                         disabled={isSaving}
-                                                        className={`font-bold transition duration-150 btn-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm ${
+                                                        className={`px-2 py-1 text-white text-xs sm:text-sm font-semibold rounded-lg transition duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm ${
                                                             deletedIds.has(p.id || 0)
-                                                                ? 'text-orange-600 hover:text-orange-800'
-                                                                : 'text-red-600 hover:text-red-800'
+                                                                ? 'bg-amber-500 hover:bg-amber-600'
+                                                                : 'bg-red-500 hover:bg-red-600'
                                                         }`}
-                                                        title={deletedIds.has(p.id || 0) ? 'Hủy xóa' : 'Đánh dấu xóa'}
                                                     >
-                                                        {deletedIds.has(p.id || 0) ? '↶' : '🗑️'}
+                                                        {deletedIds.has(p.id || 0) ? 'Hủy' : 'Xóa'}
                                                     </button>
                                                 </div>
                                             </td>
@@ -519,14 +512,13 @@ export default function EditTab({
                                                 </select>
                                             </td>
                                             <td className="px-2 py-2 text-center">
-                                                <div className="flex justify-center space-x-1">
+                                                <div className="flex justify-center gap-1 flex-wrap">
                                                     <button
                                                         onClick={handleCreatePlayer}
                                                         disabled={isSaving}
-                                                        className="text-green-600 hover:text-green-800 font-bold transition duration-150 btn-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                                                        title="Lưu người chơi mới"
+                                                        className="px-2 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-xs sm:text-sm font-semibold rounded transition duration-150 disabled:cursor-not-allowed"
                                                     >
-                                                        ✓
+                                                        Lưu
                                                     </button>
                                                     <button
                                                         onClick={() => {
@@ -534,10 +526,9 @@ export default function EditTab({
                                                             setNewPlayer(emptyNewPlayer);
                                                         }}
                                                         disabled={isSaving}
-                                                        className="text-red-600 hover:text-red-800 font-bold transition duration-150 btn-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                                                        title="Hủy"
+                                                        className="px-2 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white text-xs sm:text-sm font-semibold rounded transition duration-150 disabled:cursor-not-allowed"
                                                     >
-                                                        ✗
+                                                        Hủy
                                                     </button>
                                                 </div>
                                             </td>

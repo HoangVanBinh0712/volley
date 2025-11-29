@@ -113,15 +113,18 @@ export default function ConstraintManager({
             </h3>
 
             {/* Together Groups Section */}
-            <div className="space-y-4 bg-white p-5 rounded-xl border-2 border-blue-200 shadow-sm">
-                <div className="flex justify-between items-center">
-                    <label className="flex items-center gap-2 text-base font-bold text-blue-900">
-                        <span className="text-xl">👥</span>
-                        Together Groups <span className="text-sm font-normal text-gray-600">(Cùng Đội)</span>
+            <div className="space-y-4 bg-white p-3 sm:p-5 rounded-xl border-2 border-blue-200 shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <label className="flex items-center gap-2 text-sm sm:text-base font-bold text-blue-900">
+                        <span className="text-lg sm:text-xl">👥</span>
+                        <span className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                            <span>Nhóm chung</span>
+                            <span className="text-xs sm:text-sm font-normal text-gray-600">(Cùng Đội)</span>
+                        </span>
                     </label>
                     <button
                         onClick={addTogetherGroup}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+                        className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                     >
                         + Thêm Nhóm
                     </button>
@@ -134,12 +137,12 @@ export default function ConstraintManager({
                 ) : (
                     <div className="space-y-3">
                         {togetherGroups.map((group, groupIndex) => (
-                            <div key={groupIndex} className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200 space-y-3">
+                            <div key={groupIndex} className="bg-blue-50 p-3 sm:p-4 rounded-lg border-2 border-blue-200 space-y-2 sm:space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm font-bold text-blue-900 bg-blue-200 px-3 py-1 rounded-full">Nhóm {groupIndex + 1}</span>
+                                    <span className="text-xs sm:text-sm font-bold text-blue-900 bg-blue-200 px-2 sm:px-3 py-1 rounded-full">Nhóm {groupIndex + 1}</span>
                                     <button
                                         onClick={() => removeTogetherGroup(groupIndex)}
-                                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition duration-200 shadow-sm"
+                                        className="px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition duration-200 shadow-sm"
                                     >
                                         ✕ Xóa
                                     </button>
@@ -151,15 +154,15 @@ export default function ConstraintManager({
 
                                     return (
                                         <div key={playerIndex} className="relative">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs font-bold text-blue-700 bg-blue-200 px-2 py-1 rounded w-10 text-center">P{playerIndex + 1}</span>
+                                            <div className="flex items-center gap-1 sm:gap-2">
+                                                <span className="text-xs font-bold text-blue-700 bg-blue-200 px-1 sm:px-2 py-1 rounded w-8 sm:w-10 text-center shrink-0">P{playerIndex + 1}</span>
                                                 <input
                                                     type="text"
                                                     value={player}
                                                     onChange={(e) => updateTogetherPlayer(groupIndex, playerIndex, e.target.value)}
                                                     onFocus={() => toggleTogetherSuggestion(suggestionKey)}
-                                                    placeholder="Nhập tên người chơi"
-                                                    className="flex-1 px-3 py-2 border-2 border-blue-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                                                    placeholder="Nhập tên"
+                                                    className="flex-1 min-w-0 px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-blue-300 rounded-lg text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                                                 />
                                             </div>
 
@@ -194,15 +197,18 @@ export default function ConstraintManager({
             </div>
 
             {/* Separate Groups Section */}
-            <div className="space-y-4 bg-white p-5 rounded-xl border-2 border-orange-200 shadow-sm">
-                <div className="flex justify-between items-center">
-                    <label className="flex items-center gap-2 text-base font-bold text-orange-900">
-                        <span className="text-xl">✖️</span>
-                        Separate Groups <span className="text-sm font-normal text-gray-600">(Khác Đội)</span>
+            <div className="space-y-4 bg-white p-3 sm:p-5 rounded-xl border-2 border-orange-200 shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <label className="flex items-center gap-2 text-sm sm:text-base font-bold text-orange-900">
+                        <span className="text-lg sm:text-xl">✖️</span>
+                        <span className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                            <span>Nhóm riêng</span>
+                            <span className="text-xs sm:text-sm font-normal text-gray-600">(Khác Đội)</span>
+                        </span>
                     </label>
                     <button
                         onClick={addSeparateGroup}
-                        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+                        className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm font-bold rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                     >
                         + Thêm Nhóm
                     </button>
@@ -215,33 +221,33 @@ export default function ConstraintManager({
                 ) : (
                     <div className="space-y-3">
                         {separateGroups.map((group, groupIndex) => (
-                            <div key={groupIndex} className="bg-orange-50 p-4 rounded-lg border-2 border-orange-200 space-y-3">
+                            <div key={groupIndex} className="bg-orange-50 p-3 sm:p-4 rounded-lg border-2 border-orange-200 space-y-2 sm:space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm font-bold text-orange-900 bg-orange-200 px-3 py-1 rounded-full">Nhóm {groupIndex + 1}</span>
+                                    <span className="text-xs sm:text-sm font-bold text-orange-900 bg-orange-200 px-2 sm:px-3 py-1 rounded-full">Nhóm {groupIndex + 1}</span>
                                     <button
                                         onClick={() => removeSeparateGroup(groupIndex)}
-                                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition duration-200 shadow-sm"
+                                        className="px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg transition duration-200 shadow-sm"
                                     >
                                         ✕ Xóa
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
                                     {group.map((player, playerIndex) => {
                                         const suggestionKey = `separate_${groupIndex}_${playerIndex}`;
                                         const filteredSuggestions = getFilteredSuggestions(player);
 
                                         return (
                                             <div key={playerIndex} className="relative">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs font-bold text-orange-700 bg-orange-200 px-2 py-1 rounded w-10 text-center">P{playerIndex + 1}</span>
+                                                <div className="flex items-center gap-1 sm:gap-2">
+                                                    <span className="text-xs font-bold text-orange-700 bg-orange-200 px-1 sm:px-2 py-1 rounded w-8 sm:w-10 text-center shrink-0">P{playerIndex + 1}</span>
                                                     <input
                                                         type="text"
                                                         value={player}
                                                         onChange={(e) => updateSeparatePlayer(groupIndex, playerIndex, e.target.value)}
                                                         onFocus={() => toggleSeparateSuggestion(suggestionKey)}
-                                                        placeholder={`Người ${playerIndex + 1}`}
-                                                        className="flex-1 px-3 py-2 border-2 border-orange-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                                                        placeholder="Nhập tên"
+                                                        className="flex-1 min-w-0 px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-orange-300 rounded-lg text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
                                                     />
                                                 </div>
 
