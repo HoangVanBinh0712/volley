@@ -291,7 +291,7 @@ export default function EditTab({
                                         <th className="px-2 sm:px-4 py-2 text-center text-xs sm:text-sm font-bold uppercase w-32">Hành động</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-100">
+                                <tbody className="bg-white divide-y divide-gray-100 text-gray-900">
                                     {players.map((p) => (
                                         <tr
                                             key={p.id}

@@ -133,7 +133,7 @@ export default function PlayerSelection({ onPlayersSelected }: PlayerSelectionPr
 
                     {/* Player Table */}
                     <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                        <table className="w-full">
+                        <table className="w-full text-gray-900">
                             <thead className="bg-indigo-600 text-white sticky top-0">
                                 <tr>
                                     <th className="px-2 sm:px-4 py-3 text-left w-10 sm:w-12">

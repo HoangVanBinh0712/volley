@@ -113,7 +113,7 @@ export default function ConstraintManager({
             </h3>
 
             {/* Together Groups Section */}
-            <div className="space-y-4 bg-white p-3 sm:p-5 rounded-xl border-2 border-blue-200 shadow-sm">
+            <div className="space-y-4 bg-white p-3 sm:p-5 rounded-xl border-2 border-blue-200 shadow-sm text-gray-900">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <label className="flex items-center gap-2 text-sm sm:text-base font-bold text-blue-900">
                         <span className="text-lg sm:text-xl">👥</span>
@@ -197,7 +197,7 @@ export default function ConstraintManager({
             </div>
 
             {/* Separate Groups Section */}
-            <div className="space-y-4 bg-white p-3 sm:p-5 rounded-xl border-2 border-orange-200 shadow-sm">
+            <div className="space-y-4 bg-white p-3 sm:p-5 rounded-xl border-2 border-orange-200 shadow-sm text-gray-900">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <label className="flex items-center gap-2 text-sm sm:text-base font-bold text-orange-900">
                         <span className="text-lg sm:text-xl">✖️</span>
