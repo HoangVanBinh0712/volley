@@ -106,13 +106,11 @@ export default function ResultsTable({ teams }: ResultsTableProps) {
                 </div>
             </div>
 
-            <div className={`grid gap-2 ${teams.length <= 2 ? 'grid-cols-2' : teams.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+            <div className="grid grid-cols-3 gap-2">
             {teams.map((team) => (
                 <div key={team.id} className="border-2 border-gray-200 rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden">
-                    <div className={`bg-linear-to-r from-indigo-100 to-purple-100 border-b-2 border-indigo-200 ${teams.length <= 2 ? 'p-2' : 'p-1.5'}`}>
-                        <h3 className={`font-bold text-indigo-800 text-center ${teams.length <= 2 ? 'text-sm sm:text-base' : teams.length === 3 ? 'text-xs sm:text-sm' : 'text-[10px] sm:text-sm'}`}>
-                            🏆 {teams.length <= 2 ? `ĐỘI ${team.id}` : team.id}
-                        </h3>
+                    <div className="p-1.5 bg-linear-to-r from-indigo-100 to-purple-100 border-b-2 border-indigo-200">
+                        <h3 className="text-xs sm:text-sm font-bold text-indigo-800 text-center">🏆 ĐỘI {team.id}</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full divide-y divide-gray-200">
@@ -124,7 +122,7 @@ export default function ResultsTable({ teams }: ResultsTableProps) {
                                                 ? 'hover:bg-indigo-50' 
                                                 : 'bg-gray-50 hover:bg-indigo-50'
                                         } text-gray-700`}>
-                                            <td className={`whitespace-nowrap font-bold ${teams.length <= 2 ? 'px-2 py-1.5 text-xs sm:text-sm' : teams.length === 3 ? 'px-1.5 py-1 text-[10px] sm:text-xs' : 'px-1 py-1 text-[10px] sm:text-xs'}`}>
+                                            <td className="px-1.5 py-1 whitespace-nowrap font-bold text-[10px] sm:text-xs">
                                                 {p.name}
                                             </td>
                                         </tr>
