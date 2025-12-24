@@ -4,6 +4,22 @@
 
 export const ROLE_OPTIONS = ["Setter", "Spiker", "Flex", "Libero"];
 
+// Tier to score mapping for player ratings
+export const TIER_SCORES: Record<string, number> = {
+    'S': 95,
+    'A+': 85,
+    'A': 75,
+    'B+': 65,
+    'B': 55,
+    'C+': 45,
+    'C': 35,
+    'D+': 25,
+    'D': 15
+};
+
+// Extract tier keys for dropdown options
+export const TIER_OPTIONS = Object.keys(TIER_SCORES);
+
 export const TAILWIND_STYLES = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
     body { font-family: 'Inter', sans-serif; }

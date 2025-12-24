@@ -3,26 +3,12 @@
 import { useState } from 'react';
 import { Player } from '@/app/types/volleyball';
 import { fetchAllPlayers, updatePlayer, deletePlayer, createPlayer } from '@/app/lib/playerQueries';
-import { ROLE_OPTIONS } from '@/app/constants/volleyConstants';
+import { ROLE_OPTIONS, TIER_OPTIONS } from '@/app/constants/volleyConstants';
 import { useToast } from './ToastProvider';
 
 interface EditTabProps {
     onUpdatePlayers: (players: Player[]) => void;
 }
-
-// Tier scores mapping
-const TIER_SCORES: Record<string, number> = {
-    'S': 95,
-    'A+': 85,
-    'A': 75,
-    'B+': 65,
-    'B': 55,
-    'C+': 45,
-    'C': 35
-};
-
-// Extract tier keys for dropdown options
-const TIER_OPTIONS = Object.keys(TIER_SCORES);
 
 interface NewPlayerForm {
     name: string;

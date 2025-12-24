@@ -4,17 +4,7 @@
  */
 
 import { Player, BasicPlayer, Team, isBasicPlayer } from '@/app/types/volleyball';
-
-// Tier to score mapping for Basic mode
-const TIER_SCORES: Record<string, number> = {
-    'S': 95,
-    'A+': 85,
-    'A': 75,
-    'B+': 65,
-    'B': 55,
-    'C+': 45,
-    'C': 35
-};
+import { TIER_SCORES } from '@/app/constants/volleyConstants';
 
 /**
  * Calculate OPS for Basic player (average of position and sub_position tier scores)
